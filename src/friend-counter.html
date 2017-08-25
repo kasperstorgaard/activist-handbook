@@ -1,0 +1,55 @@
+<link rel="import" href="../node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="./redux-store.html">
+
+<dom-module id="friend-counter">
+  <template>
+    <h3>You have [[_friendCount]] friends!</h3>
+  </template>
+  <script>
+    class FriendCounter extends StoreMixin(Polymer.Element) {
+      static get is() { return 'friend-counter' }
+      static get properties() {
+        return {
+          _friends: {
+            type: Array,
+            value: () => []
+          },
+          _friendCount: {
+            type: Number,
+            computed: '_getFriendCount(_friends)'
+          }
+        };
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+
+        this._store.subscribe(() => {
+          const state = this._store.getState();
+          this._setState(this._mapState(state))
+        });
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this._store.unsubscribe();
+      }
+
+      _mapState(state) {
+        return {
+          _friends: state.friends
+        };
+      }
+
+      _setState(data) {
+        Object.assign(this, data);
+      }
+
+      _getFriendCount(friends) {
+        return friends.length;
+      }
+    }
+
+    customElements.define(FriendCounter.is, FriendCounter);
+  </script>
+</dom-module>

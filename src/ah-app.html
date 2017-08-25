@@ -1,0 +1,35 @@
+<link rel="import" href="../node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="./friend-counter.html">
+<link rel="import" href="./friend-input.html">
+
+<dom-module id="ah-app">
+  <template>
+    <style>
+      :host {
+        --app-primary-color: #fff;
+        --app-secondary-color: #000;
+
+        display: block;
+      }
+    </style>
+    <h1>Activist Handbook</h1>
+
+    <friend-counter></friend-counter>
+    <friend-input></friend-input>
+  </template>
+
+  <script>
+    class AhApp extends Polymer.Element {
+
+      static get is() { return 'ah-app'; }
+
+      constructor() {
+        super();
+
+        this._baseUrl = (new URL(this.rootPath)).pathname;
+      }
+    }
+
+    window.customElements.define(AhApp.is, AhApp);
+  </script>
+</dom-module>

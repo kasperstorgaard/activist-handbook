@@ -1,0 +1,36 @@
+
+<link rel="import" href="../node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="./redux-store.html">
+
+<dom-module id="friend-input">
+  <template>
+    <input id="field" type="text">
+    <button on-click="_addFriend">Add Friend</button>
+  </template>
+  <script>
+    const actions = {
+      addFriend(friend) {
+        return {
+          type: 'ADD_FRIEND',
+          friend
+        }
+      }
+    };
+
+    class FriendInput extends StoreMixin(Polymer.Element) {
+      static get is() { return 'friend-input' }
+
+      _addFriend() {
+        const field = this.$.field;
+
+        if (field.value) {
+          this._store.dispatch(actions.addFriend(field.value));
+          field.value = null;
+          field.focus();
+        }
+      }
+    }
+
+    customElements.define(FriendInput.is, FriendInput);
+  </script>
+</dom-module>

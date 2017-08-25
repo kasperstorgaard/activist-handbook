@@ -1,0 +1,35 @@
+<link rel="import" href="../node_modules/polymer-redux/dist/polymer-redux.html">
+<link rel="import" href="../libs/redux.html">
+
+<script>
+  (() => {
+    const initialState = {
+      friends: []
+    };
+
+    const reducer = (state, action) => {
+      if (!state) {
+        return initialState;
+      }
+
+      switch (action.type) {
+        case 'ADD_FRIEND':
+          const friends = state.friends.concat([action.friend]);
+          return Object.assign({}, state, { friends });
+      }
+    }
+
+    const store = Redux.createStore(reducer);
+
+    window.StoreMixin = T => class extends T {
+      constructor() {
+        super();
+        this._store = store;
+      }
+
+      _mapState() {
+        //
+      }
+    }
+  })();
+</script>
