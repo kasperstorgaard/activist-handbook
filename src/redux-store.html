@@ -1,4 +1,3 @@
-<link rel="import" href="../node_modules/polymer-redux/dist/polymer-redux.html">
 <link rel="import" href="../libs/redux.html">
 
 <script>
@@ -22,13 +21,35 @@
     const store = Redux.createStore(reducer);
 
     window.StoreMixin = T => class extends T {
-      constructor() {
-        super();
-        this._store = store;
+      connectedCallback() {
+        super.connectedCallback();
+
+        this._dispatch = store.dispatch.bind(store);
+
+        if (!('_mapStateToProps' in this)) {
+          return;
+        }
+
+        this.__handleStoreChange = () => {
+          const state = store.getState();
+          const props = this._mapStateToProps(state);
+
+          if (typeof props !== 'object') {
+            throw new Error('ReduxStore: method `_mapStateToProps()` must return an object.');
+          }
+
+          Object.assign(this, props);
+        };
+
+        store.subscribe(this.__handleStoreChange);
       }
 
-      _mapState() {
-        //
+      disconnectedCallback() {
+        super.disconnectedCallback();
+
+        if (this.__handleStoreChange) {
+          store.unsubscribe(this.__handleStoreChange);
+        }
       }
     }
   })();

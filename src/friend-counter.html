@@ -21,28 +21,10 @@
         };
       }
 
-      connectedCallback() {
-        super.connectedCallback();
-
-        this._store.subscribe(() => {
-          const state = this._store.getState();
-          this._setState(this._mapState(state))
-        });
-      }
-
-      disconnectedCallback() {
-        super.disconnectedCallback();
-        this._store.unsubscribe();
-      }
-
-      _mapState(state) {
+      _mapStateToProps(state) {
         return {
           _friends: state.friends
         };
-      }
-
-      _setState(data) {
-        Object.assign(this, data);
       }
 
       _getFriendCount(friends) {
