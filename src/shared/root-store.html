@@ -1,0 +1,26 @@
+<link rel="import" href="../../libs/redux.html">
+
+<script>
+  (() => {
+    const initialState = {
+      friends: ['anja']
+    };
+
+    const reducer = (state, action) => {
+      if (!state) {
+        return initialState;
+      }
+
+      switch (action.type) {
+        case 'SET_COUNTRIES':
+          return Object.assign({}, state, { countries: action.countries });
+      }
+    }
+
+    window.RootStore = Redux.createStore(
+      reducer,
+      window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+      Redux.applyMiddleware(ReduxThunk.default)
+    );
+  })();
+</script>

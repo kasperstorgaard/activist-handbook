@@ -1,0 +1,78 @@
+<link rel="import" href="../../node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="../../node_modules/@polymer/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../shared/store-mixin.html">
+
+<dom-module id="ah-countries">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Countries</h2>
+    <ul>
+      <template is="dom-repeat" items="[[_countries]]" as="country">
+        <li>[[country.name]]</li>
+      </template>
+    </ul>
+  </template>
+
+  <script>
+    const apiUrl = 'https://api.graph.cool/simple/v1/cj6nyow1w221t0143o8gq0f9p';
+
+    class AhCountries extends StoreMixin(Polymer.Element) {
+
+      static get is() { return 'ah-countries'; }
+
+      static get properties() {
+        return {
+          _countries: Array
+        }
+      }
+
+      static get actions() {
+        return {
+          getCountries() {
+            return async (dispatch) => {
+              const query = `
+              {
+                allCountries {
+                  id
+                  name
+                }
+              }
+              `;
+
+              const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({query})
+              });
+              const result = await response.json();
+
+              dispatch({
+                type: 'SET_COUNTRIES',
+                countries: result.data.allCountries
+              });
+            }
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        this._dispatch(AhCountries.actions.getCountries());
+      }
+
+      _mapStateToProps({countries}) {
+        return {
+          _countries: countries
+        };
+      }
+    }
+
+    window.customElements.define(AhCountries.is, AhCountries);
+  </script>
+</dom-module>
