@@ -1,5 +1,5 @@
 <link rel="import" href="../node_modules/@polymer/polymer/polymer-element.html">
-<link rel="import" href="./redux-store.html">
+<link rel="import" href="./store-mixin.html">
 
 <dom-module id="friend-counter">
   <template>
@@ -10,25 +10,14 @@
       static get is() { return 'friend-counter' }
       static get properties() {
         return {
-          _friends: {
-            type: Array,
-            value: () => []
-          },
-          _friendCount: {
-            type: Number,
-            computed: '_getFriendCount(_friends)'
-          }
+          _friendCount: Number
         };
       }
 
-      _mapStateToProps(state) {
+      _mapStateToProps({friends}) {
         return {
-          _friends: state.friends
+          _friendCount: friends ? friends.length : 0
         };
-      }
-
-      _getFriendCount(friends) {
-        return friends.length;
       }
     }
 

@@ -1,24 +1,8 @@
-<link rel="import" href="../libs/redux.html">
+<link rel="import" href="./root-store.html">
 
 <script>
   (() => {
-    const initialState = {
-      friends: []
-    };
-
-    const reducer = (state, action) => {
-      if (!state) {
-        return initialState;
-      }
-
-      switch (action.type) {
-        case 'ADD_FRIEND':
-          const friends = state.friends.concat([action.friend]);
-          return Object.assign({}, state, { friends });
-      }
-    }
-
-    const store = Redux.createStore(reducer);
+    const store = window.RootStore;
 
     window.StoreMixin = T => class extends T {
       connectedCallback() {
@@ -42,6 +26,9 @@
         };
 
         store.subscribe(this.__handleStoreChange);
+
+        // Initialize the state.
+        this.__handleStoreChange();
       }
 
       disconnectedCallback() {
