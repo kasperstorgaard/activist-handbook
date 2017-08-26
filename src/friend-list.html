@@ -1,0 +1,35 @@
+<link rel="import" href="../node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="../node_modules/@polymer/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="./store-mixin.html">
+
+<dom-module id="friend-list">
+  <template>
+    <ul>
+      <template is="dom-repeat" items="{{_friends}}" as="friend">
+        <li>[[friend]]</li>
+      </template>
+    </ul>
+  </template>
+  <script>
+    class FriendList extends StoreMixin(Polymer.Element) {
+      static get is() { return 'friend-list' }
+
+      static get properties() {
+        return {
+          _friends: {
+            type: Array,
+            value: () => []
+          }
+        }
+      }
+
+      _mapStateToProps({friends}) {
+        return {
+          _friends: friends
+        };
+      }
+    }
+
+    customElements.define(FriendList.is, FriendList);
+  </script>
+</dom-module>
