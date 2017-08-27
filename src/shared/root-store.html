@@ -14,6 +14,8 @@
       switch (action.type) {
         case 'SET_COUNTRIES':
           return Object.assign({}, state, { countries: action.countries });
+        case 'SET_COUNTRY':
+          return Object.assign({}, state, { country: action.country });
       }
     }
 

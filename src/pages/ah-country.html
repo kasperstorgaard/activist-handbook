@@ -1,0 +1,82 @@
+<link rel="import" href="../../node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="../../node_modules/@polymer/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../shared/store-mixin.html">
+
+<dom-module id="ah-country">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Country</h2>
+    <h3>[[_country.name]]</h3>
+  </template>
+
+  <script>
+    class AhCountry extends StoreMixin(Polymer.Element) {
+
+      static get is() { return 'ah-country'; }
+
+      static get properties() {
+        return {
+          name: {
+            type: String,
+            observer: '_nameChanged'
+          },
+          _country: {
+            type: Object,
+            value: () => ({ name: null })
+          }
+        }
+      }
+
+      static get actions() {
+        return {
+          getCountry(name) {
+            return async (dispatch) => {
+              const query = `
+              query CountryByName($name: String) {
+                Country(name: $name) {
+                  id
+                  name
+                }
+              }
+              `
+
+              const data = await GraphQLService.query(query, {name});
+
+              dispatch({
+                type: 'SET_COUNTRY',
+                country: data.Country
+              });
+            }
+          },
+
+          clearCountry() {
+            return {
+              type: 'SET_COUNTRY',
+              country: null
+            };
+          }
+        }
+      }
+
+      _nameChanged(name) {
+        if (!name) {
+          this._dispatch(AhCountry.actions.clearCountry());
+        } else {
+          this._dispatch(AhCountry.actions.getCountry(name));
+        }
+      }
+
+      _mapStateToProps({country}) {
+        return {
+          _country: country
+        };
+      }
+    }
+
+    window.customElements.define(AhCountry.is, AhCountry);
+  </script>
+</dom-module
