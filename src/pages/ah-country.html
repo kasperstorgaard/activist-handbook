@@ -35,14 +35,13 @@
         return {
           getCountry(name) {
             return async (dispatch) => {
-              const query = `
-              query CountryByName($name: String) {
+              const query =
+             `query CountryByName($name: String) {
                 Country(name: $name) {
                   id
                   name
                 }
-              }
-              `
+              }`;
 
               const data = await GraphQLService.query(query, {name});
 
