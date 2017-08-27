@@ -1,7 +1,9 @@
 <link rel="import" href="../../node_modules/@polymer/polymer/polymer-element.html">
 <link rel="import" href="../../node_modules/@polymer/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../libs/redux/redux-actions.html">
 <link rel="import" href="../shared/graphql-service.html">
 <link rel="import" href="../shared/store-mixin.html">
+<link rel="import" href="../stores/countries/countries-store.html">
 
 <dom-module id="ah-countries">
   <template>
@@ -19,7 +21,7 @@
   </template>
 
   <script>
-    class AhCountries extends StoreMixin(Polymer.Element) {
+    class AhCountries extends Stores.Mixin(Polymer.Element) {
 
       static get is() { return 'ah-countries'; }
 
@@ -42,10 +44,7 @@
               }
               `);
 
-              dispatch({
-                type: 'COUNTRIES_LOAD',
-                payload: data.allCountries
-              });
+              dispatch(Stores.Countries.actions.load(data.allCountries));
             }
           }
         }

@@ -1,14 +1,14 @@
-<link rel="import" href="./root-store.html">
+<link rel="import" href="../stores/root-store.html">
 
 <script>
   (() => {
-    const store = window.RootStore;
+    const Stores = window.Stores || (window.Stores = {});
 
-    window.StoreMixin = T => class extends T {
+    const StoreMixin = T => class extends T {
       constructor() {
         super();
 
-        this._dispatch = store.dispatch.bind(store);
+        this._dispatch = Stores.Root.dispatch.bind(Stores.Root);
       }
 
       connectedCallback() {
@@ -19,7 +19,7 @@
         }
 
         this.__handleStoreChange = () => {
-          const state = store.getState();
+          const state = Stores.Root.getState();
           const props = this._mapStateToProps(state);
 
           if (typeof props !== 'object') {
@@ -29,7 +29,7 @@
           Object.assign(this, props);
         };
 
-        store.subscribe(this.__handleStoreChange);
+        Stores.Root.subscribe(this.__handleStoreChange);
 
         // Initialize the state.
         this.__handleStoreChange();
@@ -39,9 +39,11 @@
         super.disconnectedCallback();
 
         if (this.__handleStoreChange) {
-          store.unsubscribe(this.__handleStoreChange);
+          Stores.Root.unsubscribe(this.__handleStoreChange);
         }
       }
     }
+
+    Stores.Mixin = StoreMixin;
   })();
 </script>

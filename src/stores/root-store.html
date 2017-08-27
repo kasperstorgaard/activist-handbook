@@ -1,0 +1,25 @@
+<link rel="import" href="../../libs/redux/redux.html">
+<link rel="import" href="../../libs/redux/redux-thunk.html">
+
+<script>
+  (() => {
+    const Stores = window.Stores || (window.Stores = {});
+
+    const reducers = {};
+
+    const store = Redux.createStore(
+      Redux.combineReducers(reducers),
+      (__REDUX_DEVTOOLS_EXTENSION__ || (() => null))(),
+      Redux.applyMiddleware(ReduxThunk.default)
+    );
+
+    function addReducers(lazyReducers) {
+      Object.assign(reducers, lazyReducers);
+      const reducer = Redux.combineReducers(reducers);
+      store.replaceReducer(reducer);
+    }
+
+    Stores.Root = store;
+    Stores.addReducers = addReducers;
+  })();
+</script>
