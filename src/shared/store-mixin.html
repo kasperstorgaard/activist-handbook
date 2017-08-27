@@ -5,10 +5,14 @@
     const store = window.RootStore;
 
     window.StoreMixin = T => class extends T {
-      connectedCallback() {
-        super.connectedCallback();
+      constructor() {
+        super();
 
         this._dispatch = store.dispatch.bind(store);
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
 
         if (!('_mapStateToProps' in this)) {
           return;
