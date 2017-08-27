@@ -47,7 +47,7 @@
 
               dispatch({
                 type: 'SET_COUNTRY',
-                country: data.Country
+                payload: data.Country
               });
             }
           },
@@ -55,7 +55,7 @@
           clearCountry() {
             return {
               type: 'SET_COUNTRY',
-              country: null
+              payload: null
             };
           }
         }

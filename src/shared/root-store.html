@@ -7,20 +7,18 @@
       countries: []
     };
 
-    const reducer = (state, action) => {
+    const reducer = (state, {type, payload = null}) => {
       if (!state) {
         return initialState;
       }
 
       const handleActions = {
-        'SET_COUNTRIES': () =>
-          Object.assign({}, state, { countries: action.countries }),
-        'SET_COUNTRY': () =>
-          Object.assign({}, state, { country: action.country })
-      }
+        'SET_COUNTRIES': () => Object.assign({}, state, { countries: payload }),
+        'SET_COUNTRY': () => Object.assign({}, state, { country: payload })
+      };
 
-      const fn = handleActions[action.type] || (() => state);
-      return fn();
+      const handleAction = handleActions[type] || (() => state);
+      return handleAction();
     }
 
     window.RootStore = Redux.createStore(
