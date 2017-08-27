@@ -12,12 +12,15 @@
         return initialState;
       }
 
-      switch (action.type) {
-        case 'SET_COUNTRIES':
-          return Object.assign({}, state, { countries: action.countries });
-        case 'SET_COUNTRY':
-          return Object.assign({}, state, { country: action.country });
+      const handleActions = {
+        'SET_COUNTRIES': () =>
+          Object.assign({}, state, { countries: action.countries }),
+        'SET_COUNTRY': () =>
+          Object.assign({}, state, { country: action.country })
       }
+
+      const fn = handleActions[action.type] || (() => state);
+      return fn();
     }
 
     window.RootStore = Redux.createStore(
