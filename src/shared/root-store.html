@@ -13,8 +13,8 @@
       }
 
       const handleActions = {
-        'SET_COUNTRIES': () => Object.assign({}, state, { countries: payload }),
-        'SET_COUNTRY': () => Object.assign({}, state, { country: payload })
+        'COUNTRIES_LOAD': () => Object.assign({}, state, { countries: payload }),
+        'COUNTRY_DETAIL_LOAD': () => Object.assign({}, state, { country: payload })
       };
 
       const handleAction = handleActions[type] || (() => state);

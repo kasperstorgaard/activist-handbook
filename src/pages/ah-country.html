@@ -46,7 +46,7 @@
               const data = await GraphQLService.query(query, {name});
 
               dispatch({
-                type: 'SET_COUNTRY',
+                type: 'COUNTRY_DETAIL_LOAD',
                 payload: data.Country
               });
             }
@@ -54,7 +54,7 @@
 
           clearCountry() {
             return {
-              type: 'SET_COUNTRY',
+              type: 'COUNTRY_DETAIL_LOAD',
               payload: null
             };
           }
