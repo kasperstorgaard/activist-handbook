@@ -23,7 +23,7 @@
 
     window.RootStore = Redux.createStore(
       reducer,
-      window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+      (__REDUX_DEVTOOLS_EXTENSION__ || (() => null))(),
       Redux.applyMiddleware(ReduxThunk.default)
     );
   })();
