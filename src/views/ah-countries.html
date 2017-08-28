@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../libs/redux/redux-actions.html">
 <link rel="import" href="../shared/graphql-service.html">
 <link rel="import" href="../shared/store-mixin.html">
@@ -11,17 +12,22 @@
       :host {
         display: block;
       }
+      .loader {
+        width: 100%;
+      }
       [hidden] {
         display: none;
       }
     </style>
     <h2>Countries</h2>
-    <div hidden$="[[!_loading]]">loading...</div>
-    <ul hidden$="[[_loading]]">
-      <template is="dom-repeat" items="[[_countries]]" as="country">
-        <li>[[country.name]]</li>
-      </template>
-    </ul>
+    <div class="loader" hidden$="[[!_loading]]">fetching countries, one sec.</div>
+    <template is="dom-repeat" items="[[_countries]]" as="country">
+      <paper-card>
+        <div class="card-content">
+          [[country.name]]
+        </div>
+      </paper-card>
+    </template>
   </template>
 
   <script>

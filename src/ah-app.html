@@ -1,4 +1,10 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="./views/ah-countries.html">
 <link rel="import" href="./views/ah-country.html">
 
@@ -6,15 +12,60 @@
   <template>
     <style>
       :host {
-        --app-primary-color: #fff;
-        --app-secondary-color: #000;
-
         display: block;
       }
+
+      app-toolbar {
+        background-color: #4285f4;
+        color: #fff;
+      }
+
+      paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+      paper-icon-button + [main-title] {
+        margin-left: 24px;
+      }
+
+      app-header {
+        @apply --layout-fixed-top;
+        color: #fff;
+        --app-header-background-rear-layer: {
+          background-color: #ef6c00;
+        };
+      }
+
+      app-drawer {
+        z-index: 1;
+
+        --app-drawer-scrim-background: rgba(0, 0, 100, 0.8);
+        --app-drawer-content-container: {
+          background-color: #B0BEC5;
+        }
+      }
+
+      .content {
+        padding-top: 64px;
+        margin: 0 24px;
+      }
+
     </style>
-    <h1>Activist Handbook</h1>
-    <ah-countries></ah-countries>
-    <ah-country name="denmark"></ah-country>
+    <app-header reveals>
+      <app-toolbar>
+        <paper-icon-button icon="menu" on-click="_toggleDrawer"></paper-icon-button>
+        <div main-title>Activist Handbook</div>
+        <paper-icon-button icon="delete"></paper-icon-button>
+        <paper-icon-button icon="search"></paper-icon-button>
+        <paper-icon-button icon="close"></paper-icon-button>
+      </app-toolbar>
+    </app-header>
+    <app-drawer id="drawer" swipe-open>
+    </app-drawer>
+    <div class="content">
+      <ah-countries></ah-countries>
+      <ah-country name="denmark"></ah-country>
+    </div>
   </template>
 
   <script>
@@ -26,6 +77,10 @@
         super();
 
         this._baseUrl = (new URL(this.rootPath)).pathname;
+      }
+
+      _toggleDrawer() {
+        this.$.drawer.toggle();
       }
     }
 
