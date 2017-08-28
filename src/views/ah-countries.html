@@ -11,9 +11,13 @@
       :host {
         display: block;
       }
+      [hidden] {
+        display: none;
+      }
     </style>
     <h2>Countries</h2>
-    <ul>
+    <div hidden$="[[!_loading]]">loading...</div>
+    <ul hidden$="[[_loading]]">
       <template is="dom-repeat" items="[[_countries]]" as="country">
         <li>[[country.name]]</li>
       </template>
@@ -21,47 +25,45 @@
   </template>
 
   <script>
-    class AhCountries extends Stores.Mixin(Polymer.Element) {
-
-      static get is() { return 'ah-countries'; }
-
-      static get properties() {
-        return {
-          _countries: Array
-        }
-      }
-
-      static get actions() {
-        return {
-          getCountries() {
-            return async (dispatch) => {
-              const data = await GraphQLService.query(`
-              {
-                allCountries {
-                  id
-                  name
-                }
-              }
-              `);
-
-              dispatch(Stores.Countries.actions.load(data.allCountries));
+    (() => {
+      async function getCountries() {
+          const data = await GraphQLService.query(`
+          {
+            allCountries {
+              id
+              name
             }
           }
+          `);
+          return data.allCountries;
+      }
+
+      class AhCountries extends Stores.Mixin(Polymer.Element) {
+
+        static get is() { return 'ah-countries'; }
+
+        static get properties() {
+          return {
+            _countries: Array,
+            _loading: Boolean
+          }
+        }
+
+        connectedCallback() {
+          super.connectedCallback();
+
+          this._dispatch(Stores.Countries.hydrate(getCountries()));
+        }
+
+        _mapStateToProps({countries}) {
+          return {
+            _countries: countries.items,
+            _loading: countries.loading
+          };
         }
       }
 
-      connectedCallback() {
-        super.connectedCallback();
-        this._dispatch(AhCountries.actions.getCountries());
-      }
-
-      _mapStateToProps({countries}) {
-        return {
-          _countries: countries
-        };
-      }
-    }
-
-    window.customElements.define(AhCountries.is, AhCountries);
+      window.customElements.define(AhCountries.is, AhCountries);
+    })();
   </script>
 </dom-module>

@@ -6,28 +6,43 @@
     const Stores = window.Stores || (window.Stores = {});
 
     // Types
+    const INIT = 'countries/INIT';
     const LOAD = 'countries/LOAD';
 
     // Actions
+    const init = ReduxActions.createAction(INIT);
     const load = ReduxActions.createAction(LOAD);
 
+    // Operations
+    const hydrate = (countriesPromise) =>
+      async dispatch => {
+        await dispatch(init());
+        const countries = await countriesPromise;
+        dispatch(load(countries));
+      };
+
     // State
-    const initialState = [];
+    const initialState = {
+      loading: false,
+      items: []
+    };
 
     // Reducers
     const reducer = ReduxActions.handleActions({
-      [LOAD]: (state, {payload}) => payload
+      [INIT]: (state, {payload}) => Object.assign(state, {loading: true}),
+      [LOAD]: (state, {payload}) => Object.assign(state, {items: payload, loading: false})
     }, initialState);
 
     Stores.addReducers({countries: reducer});
 
     Stores.Countries = {
       types: {
+        INIT,
         LOAD
       },
-      actions: {
-        load
-      }
+      init,
+      load,
+      hydrate
     };
   })();
 </script>
