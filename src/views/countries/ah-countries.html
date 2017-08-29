@@ -1,7 +1,6 @@
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../../bower_components/paper-card/paper-card.html">
-<link rel="import" href="../../../bower_components/flag-icon/flag-icon.html">
 <link rel="import" href="../../../libs/redux/redux-actions.html">
 <link rel="import" href="../../stores/countries/countries-store.html">
 <link rel="import" href="../../shared/graphql-service.html">
@@ -32,14 +31,7 @@
         display: flex;
         flex-wrap: wrap;
         height: 200px;
-        width: 23vw;
-        padding: 0px 8px;
-      }
-
-      .card-image {
-        height: 80%;
-        width: 100%;
-        @apply --paper-card-header-image;
+        width: 22vw;
       }
 
       flag-icon {
@@ -51,13 +43,10 @@
     <div class="loader" hidden$="[[!_loading]]">fetching countries, one sec.</div>
     <div class="countries">
       <template is="dom-repeat" items="[[_countries]]" as="country">
-        <paper-card class="country">
-          <div class="card-image">
-            <flag-icon key$="[[country.name]]"></flag-icon>
-          </div>
-          <div class="card-content">
-            [[country.name]]
-          </div>
+        <paper-card class="country"
+          image="../../../bower_components/flag-icon-css/flags/4x3/[[country.countryCode]].svg"
+          alt="the flag of [[country.name]]"
+          heading="[[country.name]]">
         </paper-card>
       </template>
     </div>
@@ -71,6 +60,7 @@
             allCountries {
               id
               name
+              countryCode
             }
           }
           `);
