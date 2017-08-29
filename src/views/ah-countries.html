@@ -1,10 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/flag-icon/flag-icon.html">
 <link rel="import" href="../../libs/redux/redux-actions.html">
+<link rel="import" href="../stores/countries/countries-store.html">
 <link rel="import" href="../shared/graphql-service.html">
 <link rel="import" href="../shared/store-mixin.html">
-<link rel="import" href="../stores/countries/countries-store.html">
 
 <dom-module id="ah-countries">
   <template>
@@ -12,22 +13,54 @@
       :host {
         display: block;
       }
+
       .loader {
         width: 100%;
       }
+
       [hidden] {
         display: none;
+      }
+
+      .countries {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .country {
+        display: flex;
+        flex-wrap: wrap;
+        height: 200px;
+        width: 23vw;
+        padding: 0px 8px;
+      }
+
+      .card-image {
+        height: 80%;
+        width: 100%;
+        @apply --paper-card-header-image;
+      }
+
+      flag-icon {
+        height: 100%;
+        width: 100%;
       }
     </style>
     <h2>Countries</h2>
     <div class="loader" hidden$="[[!_loading]]">fetching countries, one sec.</div>
-    <template is="dom-repeat" items="[[_countries]]" as="country">
-      <paper-card>
-        <div class="card-content">
-          [[country.name]]
-        </div>
-      </paper-card>
-    </template>
+    <div class="countries">
+      <template is="dom-repeat" items="[[_countries]]" as="country">
+        <paper-card class="country">
+          <div class="card-image">
+            <flag-icon key$="[[country.name]]"></flag-icon>
+          </div>
+          <div class="card-content">
+            [[country.name]]
+          </div>
+        </paper-card>
+      </template>
+    </div>
   </template>
 
   <script>

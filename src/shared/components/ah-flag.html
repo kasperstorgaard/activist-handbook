@@ -1,0 +1,50 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="ah-flag">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <div style="background-image: url(static/flags.png)">
+  </template>
+
+  <script>
+    const matrix = [
+      [
+        'afghanistan', 'albania', 'algeria', 'andorra', 'angola', 'antartica', 'antigua_barbuda',
+        'argentina', 'armenia', 'aruba', 'australia', 'austria', 'azerbadjan', 'bahamas'
+      ], [
+        'bahrain', 'bangladesh', 'barbados', 'belarus', 'belgium', 'belize', 'benin', 'bhutan',
+        'bolivia', 'bosnia_herzegovina', 'botswana', 'brazil', 'brunei', 'bulgaria'
+      ],
+      // etc.
+    ];
+
+    const countryLookup = matrix.reduce((lookup, rowItems, rowIndex) => {
+
+      const rowLookup = rowItems.reduce((colLookup, name, colIndex) => {
+        const value = { [name]: {name, row: rowIndex, column: colIndex} };
+        return Object.assign(colLookup, value, {});
+      }, {});
+
+      return Object.assign(lookup, rowLookup);
+    }, {});
+
+    (() => {
+      class AhFlag extends Polymer.Element {
+        static get is() { return 'ah-flag'; }
+
+        static get properties() {
+          return {
+            name: String,
+            _position: Object
+          }
+        }
+      }
+
+      window.customElements.define(AhFlag.is, AhFlag);
+    })();
+  </script>
+</dom-module>
