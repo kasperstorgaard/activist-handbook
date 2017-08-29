@@ -1,12 +1,16 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
 <link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="./views/ah-countries.html">
-<link rel="import" href="./views/ah-country.html">
+
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 
 <dom-module id="ah-app">
   <template>
@@ -49,41 +53,111 @@
         padding-top: 64px;
         margin: 0 24px;
       }
-
     </style>
+
+    <app-location route="{{_route}}"></app-location>
+    <app-route
+      pattern="[[_baseUrl]]:page"
+      route="{{_route}}"
+      tail="{{_subroute}}"
+      data="{{_routeData}}"></app-route>
+
     <app-header reveals>
       <app-toolbar>
         <paper-icon-button icon="menu" on-click="_toggleDrawer"></paper-icon-button>
         <div main-title>Activist Handbook</div>
         <paper-icon-button icon="delete"></paper-icon-button>
-        <paper-icon-button icon="search"></paper-icon-button>
+        <paper-icon-bjutton icon="search"></paper-icon-button>
         <paper-icon-button icon="close"></paper-icon-button>
       </app-toolbar>
     </app-header>
+
     <app-drawer id="drawer" swipe-open>
     </app-drawer>
+
     <div class="content">
-      <ah-countries></ah-countries>
-      <ah-country name="denmark"></ah-country>
+      <iron-pages
+        selected="[[_page.id]]"
+        attr-for-selected="id"
+        fallback-selection="404"
+        role="main">
+        <ah-countries id="countries"></ah-countries>
+        <ah-country id="country" name="denmark"></ah-country>
+        <ah-home id="home"></ah-home>
+        <ah-404 id="404"></ah-404>
+      </iron-pages>
     </div>
   </template>
 
   <script>
-    class AhApp extends Polymer.Element {
+    (() => {
+      const pages = [{
+        id: 'home',
+        name: 'Home'
+      }, {
+        id: 'countries',
+        name: 'Countries'
+      }, {
+        id: 'country',
+        name: 'General'
+      }];
 
-      static get is() { return 'ah-app'; }
+      class AhApp extends Polymer.Element {
 
-      constructor() {
-        super();
+        static get is() { return 'ah-app'; }
 
-        this._baseUrl = (new URL(this.rootPath)).pathname;
+        static get properties() {
+          return {
+            _route: Object,
+            _routeData: Object,
+            _page: {
+              type: Object,
+              computed: '_getPage(_routeData.page)'
+            }
+          }
+        }
+
+        static get observers() {
+          return [
+            '_loadPage(_page.id)'
+          ]
+        }
+
+        constructor() {
+          super();
+
+          this._baseUrl = (new URL(this.rootPath)).pathname;
+        }
+
+        _getPath(id) {
+          return this.resolveUrl(`views/${id}/ah-${id}.html`);
+        }
+
+        _loadPage(id = '404') {
+          if (!this.$.drawer.persistent) {
+            this.$.drawer.close();
+          }
+
+          const path = this._getPath(id);
+
+          Polymer.importHref(path, null, () => {
+            Polymer.importHref(this._getPath('404'));
+          });
+        }
+        
+        _getPage(routeName) {
+          if (!routeName) {
+            routeName = 'home';
+          }
+          return pages.find(page => page.id === routeName);
+        }
+
+        _toggleDrawer() {
+          this.$.drawer.toggle();
+        }
       }
 
-      _toggleDrawer() {
-        this.$.drawer.toggle();
-      }
-    }
-
-    window.customElements.define(AhApp.is, AhApp);
+      window.customElements.define(AhApp.is, AhApp);
+    })();
   </script>
 </dom-module>

@@ -7,7 +7,7 @@
   "author": "kasperstorgaard",
   "license": "MIT",
   "scripts": {
-    "serve": "node ./server.js"
+    "serve": "./node_modules/.bin/polymer-cli serve"
   },
   "dependencies": {
     "redux": "^3.7.2",

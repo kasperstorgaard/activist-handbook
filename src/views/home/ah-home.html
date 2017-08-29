@@ -1,0 +1,22 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="ah-home">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Home</h2>
+  </template>
+
+  <script>
+    (() => {
+      class AhHome extends Polymer.Element {
+        static get is() { return 'ah-home'; }
+      }
+
+      window.customElements.define(AhHome.is, AhHome);
+    })();
+  </script>
+</dom-module>
