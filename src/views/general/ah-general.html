@@ -1,0 +1,22 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="ah-general">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>General</h2>
+  </template>
+
+  <script>
+    (() => {
+      class AhGeneral extends Polymer.Element {
+        static get is() { return 'ah-general'; }
+      }
+
+      window.customElements.define(AhGeneral.is, AhGeneral);
+    })();
+  </script>
+</dom-module>
