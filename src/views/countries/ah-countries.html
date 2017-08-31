@@ -1,17 +1,32 @@
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../../libs/redux/redux-actions.html">
 <link rel="import" href="../../stores/countries/countries-store.html">
 <link rel="import" href="../../shared/graphql-service.html">
 <link rel="import" href="../../shared/store-mixin.html">
 <link rel="import" href="../../shared/styles/ah-styles.html">
+<link rel="import" href="./country/ah-country.html">
 
 <dom-module id="ah-countries">
   <template>
     <style include="ah-styles">
       :host {
         display: block;
+        --card-width: 44vw;
+      }
+
+      @media (min-width: 540px) {
+        :host {
+          --card-width: 22vw;
+        }
+      }
+
+      @media (min-width: 960px) {
+        :host {
+          --card-width: 15vw;
+        }
       }
 
       .loader {
@@ -19,21 +34,24 @@
       }
 
       [hidden] {
-        display: none;
+        display: none !important;
       }
 
       .countries {
         width: 100%;
         display: flex;
         justify-content: space-between;
+        flex-wrap: wrap;
       }
+
 
       .country {
         --paper-card-header-color: white;
         display: flex;
         flex-wrap: wrap;
-        width: 22vw;
-        height: calc((22vw * 0.75) - 1px); /* aspect ratio 4/3 rounded one pixel down */
+        width: var(--card-width);
+        height: calc((var(--card-width) * 0.75) - 1px); /* aspect ratio 4/3 rounded one pixel down */
+        margin: 8px 0;
 
         --paper-card-header-text: {
           @apply --paper-card-header-text;
@@ -57,17 +75,28 @@
         width: 100%;
       }
     </style>
+
+    <app-route
+      pattern="/:country"
+      route="{{route}}"
+      data="{{_routeData}}"></app-route>
+
     <h2>Countries</h2>
-    <div class="loader" hidden$="[[!_loading]]">fetching countries, one sec.</div>
-    <div class="countries">
+    <div class="countries" hidden$="[[_has(_routeData.country)]]">
+      <div class="loader" hidden$="[[!_loading]]">fetching countries, one sec.</div>
       <template is="dom-repeat" items="[[_countries]]" as="country">
-        <paper-card class="country"
-          image="../../../bower_components/flag-icon-css/flags/4x3/[[country.countryCode]].svg"
-          alt="the flag of [[country.name]]"
-          heading="[[country.name]]">
-        </paper-card>
+        <a href$="/countries/[[country.name]]">
+          <paper-card class="country"
+            image="../../../bower_components/flag-icon-css/flags/4x3/[[country.countryCode]].svg"
+            alt="the flag of [[country.name]]"
+            heading="[[country.name]]">
+          </paper-card>
+        </a>
       </template>
     </div>
+    <template is="dom-if" if="[[_routeData.country]]">
+      <ah-country name="[[_routeData.country]]"></ah-country>
+    </template>
   </template>
 
   <script>
@@ -91,6 +120,12 @@
 
         static get properties() {
           return {
+            route: {
+              type: Object,
+              notifies: true
+            },
+            _subroute: Object,
+            _routeData: Object,
             _countries: Array,
             _loading: Boolean
           }
@@ -107,6 +142,11 @@
             _countries: countries.items,
             _loading: countries.loading
           };
+        }
+
+        // the limits of the current template engine...
+        _has(value) {
+          return !!value;
         }
       }
 
