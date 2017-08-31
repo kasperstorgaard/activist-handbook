@@ -1,4 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-repeat.html">
 
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
@@ -33,6 +34,7 @@
       }
 
       app-header {
+        z-index: 2;
         @apply --layout-fixed-top;
         color: #fff;
         --app-header-background-rear-layer: {
@@ -41,7 +43,7 @@
       }
 
       app-drawer {
-        z-index: 2;
+        z-index: 3;
 
         --app-drawer-scrim-background: rgba(0, 0, 100, 0.8);
         --app-drawer-content-container: {
@@ -52,6 +54,17 @@
       .content {
         padding-top: 64px;
         margin: 0 24px;
+      }
+
+      .menu {
+        padding-top: 64px;
+        display: flex:
+      }
+
+      .menu a {
+        display: block;
+        text-decoration: none;
+        padding: 12px;
       }
     </style>
 
@@ -66,13 +79,16 @@
       <app-toolbar>
         <paper-icon-button icon="menu" on-click="_toggleDrawer"></paper-icon-button>
         <div main-title>Activist Handbook</div>
-        <paper-icon-button icon="delete"></paper-icon-button>
-        <paper-icon-bjutton icon="search"></paper-icon-button>
-        <paper-icon-button icon="close"></paper-icon-button>
+        <paper-icon-button icon="search"></paper-icon-button>
       </app-toolbar>
     </app-header>
 
     <app-drawer id="drawer" swipe-open>
+      <div class="menu" role="menu">
+        <template is="dom-repeat" items="[[_menuItems]]" as="menuitem">
+          <a href$="[[menuitem.id]]" role="menuitem">[[menuitem.name]]</a>
+        </template>
+      </div>
     </app-drawer>
 
     <div class="content">
@@ -81,9 +97,10 @@
         attr-for-selected="id"
         fallback-selection="404"
         role="main">
-        <ah-countries id="countries"></ah-countries>
-        <ah-country id="country" name="denmark"></ah-country>
         <ah-home id="home"></ah-home>
+        <ah-countries id="countries" route="[[_subroute]]"></ah-countries>
+        <ah-general id="general"></ah-general>
+        <ah-import id="import"></ah-import>
         <ah-404 id="404"></ah-404>
       </iron-pages>
     </div>
@@ -91,16 +108,6 @@
 
   <script>
     (() => {
-      const pages = [{
-        id: 'home',
-        name: 'Home'
-      }, {
-        id: 'countries',
-        name: 'Countries'
-      }, {
-        id: 'country',
-        name: 'General'
-      }];
 
       class AhApp extends Polymer.Element {
 
@@ -113,6 +120,27 @@
             _page: {
               type: Object,
               computed: '_getPage(_routeData.page)'
+            },
+            _pages: {
+              type: Array,
+              value: () => [{
+                  id: 'home',
+                  name: 'Home'
+                }, {
+                  id: 'countries',
+                  name: 'Countries'
+                }, {
+                  id: 'general',
+                  name: 'General'
+                }, {
+                  id: 'import',
+                  name: 'Import',
+                  menu: false
+                }]
+            },
+            _menuItems: {
+              type: Array,
+              computed: '_getMenuItems(_pages.*)'
             }
           }
         }
@@ -149,11 +177,15 @@
           if (!routeName) {
             routeName = 'home';
           }
-          return pages.find(page => page.id === routeName);
+          return this._pages.find(page => page.id === routeName);
         }
 
         _toggleDrawer() {
           this.$.drawer.toggle();
+        }
+
+        _getMenuItems() {
+          return this._pages.filter(p => p.menu !== false);
         }
       }
 
