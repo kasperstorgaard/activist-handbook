@@ -2,7 +2,6 @@
   "name": "activist-handbook",
   "version": "0.1.0",
   "description": "activist handbook for local first aid and legal help",
-  "flat": true,
   "main": "index.js",
   "author": "kasperstorgaard",
   "license": "MIT",
@@ -16,6 +15,7 @@
   },
   "devDependencies": {
     "chalk": "^2.1.0",
-    "express": "^4.15.4"
+    "express": "^4.15.4",
+    "node-fetch": "^1.7.2"
   }
 }
