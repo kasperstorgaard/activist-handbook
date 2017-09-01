@@ -29,5 +29,8 @@
     "app-route": "PolymerElements/app-route#^2.0.2",
     "flag-icon-css": "^2.8.0",
     "shadycss": "^1.0.5"
+  },
+  "devDependencies": {
+    "paper-input": "PolymerElements/paper-input#^2.0.2"
   }
 }
