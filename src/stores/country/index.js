@@ -1,5 +1,4 @@
 import {createAction} from 'redux-actions';
-import {addReducers} from '../add-reducers';
 import {query} from '../graphql-service';
 
 // Types
