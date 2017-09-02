@@ -1,4 +1,4 @@
-import {createAction} from 'redux-actions';
+import {createAction, handleActions} from 'redux-actions';
 import {query} from '../graphql-service';
 
 // Types
@@ -7,8 +7,8 @@ const LOAD = 'country/LOAD';
 export const types = {INIT, LOAD}
 
 // Actions
-const init = ReduxActions.createAction(INIT);
-const load = ReduxActions.createAction(LOAD);
+const init = createAction(INIT);
+const load = createAction(LOAD);
 
 async function getData(name) {
   const data = await query(
@@ -28,7 +28,7 @@ async function getData(name) {
 export function get(name) {
   return async dispatch => {
     dispatch(init());
-    const data = await getName(name);
+    const data = await getData(name);
     dispatch(load(data));
   }
 }
@@ -40,7 +40,7 @@ const initialState = {
 };
 
 // Reducers
-export const reducer = ReduxActions.handleActions({
+export const reducer = handleActions({
   [INIT]: (state, {payload}) => Object.assign({}, state, {loading: true }),
   [LOAD]: (state, {payload}) => Object.assign({}, state, {data: payload, loading: false})
 }, initialState);

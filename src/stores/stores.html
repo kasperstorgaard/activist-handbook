@@ -1863,14 +1863,28 @@
   const types = {INIT, LOAD};
   
   // Actions
-  const init = ReduxActions.createAction(INIT);
-  const load = ReduxActions.createAction(LOAD);
+  const init = createAction(INIT);
+  const load = createAction(LOAD);
+  
+  async function getData(name) {
+    const data = await query(
+     `query CountryByName($name: String) {
+        Country(name: $name) {
+          id
+          name
+        }
+      }`,
+      {name}
+    );
+  
+    return data.Country;
+  }
   
   // Operations
   function get(name) {
     return async dispatch => {
       dispatch(init());
-      const data = await getName(name);
+      const data = await getData(name);
       dispatch(load(data));
     }
   }
@@ -1882,7 +1896,7 @@
   };
   
   // Reducers
-  const reducer = ReduxActions.handleActions({
+  const reducer = handleActions({
     [INIT]: (state, {payload}) => Object.assign({}, state, {loading: true }),
     [LOAD]: (state, {payload}) => Object.assign({}, state, {data: payload, loading: false})
   }, initialState);

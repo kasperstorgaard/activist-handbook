@@ -2,9 +2,7 @@
 <link rel="import" href="../../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../../bower_components/paper-card/paper-card.html">
-<link rel="import" href="../../../libs/redux/redux-actions.html">
 <link rel="import" href="../../stores/stores.html">
-<link rel="import" href="../../shared/graphql-service.html">
 <link rel="import" href="../../shared/styles/ah-styles.html">
 <link rel="import" href="./country/ah-country.html">
 
@@ -100,19 +98,6 @@
 
   <script>
     (() => {
-      async function getCountries() {
-          const data = await GraphQLService.query(`
-          {
-            allCountries {
-              id
-              name
-              countryCode
-            }
-          }
-          `);
-          return data.allCountries;
-      }
-
       class AhCountries extends Stores.Mixin(Polymer.Element) {
 
         static get is() { return 'ah-countries'; }
@@ -132,8 +117,7 @@
 
         connectedCallback() {
           super.connectedCallback();
-
-          this._dispatch(Stores.Countries.hydrate(getCountries()));
+          this._dispatch(Stores.Countries.hydrate());
         }
 
         _mapStateToProps({countries}) {
