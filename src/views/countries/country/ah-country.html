@@ -1,7 +1,6 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../../../bower_components/polymer/lib/elements/dom-repeat.html">
-<link rel="import" href="../../../shared/store-mixin.html">
-<link rel="import" href="../../../stores/country/country-store.html">
+<link rel="import" href="../../../stores/stores.html">
 
 <dom-module id="ah-country">
   <template>
@@ -25,6 +24,7 @@
             type: String,
             observer: '_nameChanged'
           },
+          _loading: Boolean,
           _country: {
             type: Object,
             value: () => ({ name: null })
@@ -32,36 +32,14 @@
         }
       }
 
-      static get actions() {
-        return {
-          getCountry(name) {
-            return async (dispatch) => {
-              const query =
-             `query CountryByName($name: String) {
-                Country(name: $name) {
-                  id
-                  name
-                }
-              }`;
-
-              const data = await GraphQLService.query(query, {name});
-              dispatch(Stores.Country.actions.load(data.Country));
-            }
-          }
-        }
-      }
-
       _nameChanged(name) {
-        if (!name) {
-          this._dispatch(Stores.Country.actions.load(null));
-        } else {
-          this._dispatch(AhCountry.actions.getCountry(name));
-        }
+        this._dispatch(Stores.Country.get(name));
       }
 
       _mapStateToProps({country}) {
         return {
-          _country: country
+          _loading: country.loading,
+          _country: country.data
         };
       }
     }
