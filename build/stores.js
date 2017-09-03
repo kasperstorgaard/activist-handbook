@@ -1,17 +1,21 @@
 const {statSync, readdirSync, writeFile} = require('fs');
 const {join} = require('path');
+const chokidar = require('chokidar');
+const {argv} = require('yargs');
+const {promisify} = require('util');
+
 const {rollup} = require('rollup');
 const commonjs = require('rollup-plugin-commonjs');
 const nodeResolve = require('rollup-plugin-node-resolve');
 const globals = require('rollup-plugin-node-globals');
 const builtins = require('rollup-plugin-node-builtins');
 
-const dir = join(__dirname, '../src/stores');
+const storesDir = join(__dirname, '../src/stores');
 const format = 'iife';
 
 async function build() {
   const bundle = await rollup({
-    input: join(dir, 'stores.js'),
+    input: join(storesDir, 'stores.js'),
     plugins: [
       commonjs(),
       nodeResolve({
@@ -37,8 +41,11 @@ async function build() {
 
   </script>`;
 
-  writeFile(join(dir, 'stores.html'), content);
+  writeFile(join(storesDir, 'stores.html'), content);
 };
 
 build();
-
+if (argv.watch) {
+  chokidar.watch(join(storesDir, '/**/*.js'))
+    .on('change', (event, path) => build());
+}
