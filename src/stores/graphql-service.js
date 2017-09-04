@@ -12,13 +12,18 @@ export async function query (query, variables) {
     variables: variables || {}
   });
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body
-  });
+  let response;
+  try {
+    response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body
+    });
+  } catch(e) {
+   throw new Error('graphql endpoint failed');
+  }
 
   const result = await response.json();
   return result.data;

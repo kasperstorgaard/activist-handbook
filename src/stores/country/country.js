@@ -4,11 +4,12 @@ import {query} from '../graphql-service';
 // Types
 const INIT = 'country/INIT';
 const LOAD = 'country/LOAD';
-export const types = {INIT, LOAD}
+const FAIL = 'country/FAIL';
 
 // Actions
 const init = createAction(INIT);
 const load = createAction(LOAD);
+const fail = createAction(FAIL);
 
 async function getData(name) {
   const data = await query(
@@ -28,21 +29,30 @@ async function getData(name) {
 export function get(name) {
   return async dispatch => {
     dispatch(init());
-    const data = await getData(name);
-    dispatch(load(data));
+    try {
+      const data = await getData(name);
+      dispatch(load(data));
+    } catch(e) {
+      dispatch(fail());
+    }
   }
 }
 
 // State
 const initialState = {
   loading: false,
-  data: null
+  data: null,
+  failed: false
 };
 
 // Reducers
 export const reducer = handleActions({
-  [INIT]: (state, {payload}) => Object.assign({}, state, {loading: true }),
-  [LOAD]: (state, {payload}) => Object.assign({}, state, {data: payload, loading: false})
+  [INIT]: (state, {payload}) =>
+    Object.assign({}, state, {loading: true, failed: false}),
+  [LOAD]: (state, {payload}) =>
+    Object.assign({}, state, {data: payload, loading: false}),
+  [FAIL]: (state, {payload}) =>
+    Object.assign({}, state, {data: null, loading: false, failed: true}),
 }, initialState);
 
 

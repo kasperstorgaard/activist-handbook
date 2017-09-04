@@ -1,5 +1,5 @@
-import * as Country from './country/index';
-import * as Countries from './countries/index';
+import * as Country from './country/country';
+import * as Countries from './countries/countries';
 
 export {Country, Countries};
 export {store as Root} from './root';
