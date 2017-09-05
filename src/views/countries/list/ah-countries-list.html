@@ -10,18 +10,18 @@
     <style include="ah-styles">
       :host {
         display: block;
-        --card-width: 44vw;
+        --card-width: 18vw;
       }
 
       @media (min-width: 540px) {
         :host {
-          --card-width: 22vw;
+          --card-width: 14vw;
         }
       }
 
       @media (min-width: 960px) {
         :host {
-          --card-width: 15vw;
+          --card-width: 8vw;
         }
       }
 
@@ -37,22 +37,39 @@
       }
 
       .country {
-        --paper-card-header-color: white;
         display: flex;
         flex-wrap: wrap;
         width: var(--card-width);
-        height: calc((var(--card-width) * 0.75) - 1px); /* aspect ratio 4/3 rounded one pixel down */
-        margin: 8px 0;
-
-        --paper-card-header-text: {
-          @apply --paper-card-header-text;
-          z-index: 1;
-        }
+        margin-bottom: calc(var(--card-width) / 4);
+        text-decoration: none;
       }
 
-      .country:after {
+      .country .flag {
+        position: relative;
+        display: flex;
+        overflow: hidden;
+        height: var(--card-width);
+      }
+
+      .country img {
+        height: 100%;
+      }
+
+      .country .name {
+        text-align: center;
+        width: 100%;
+        max-height: 2.5rem;
+        font-weight: bold;
+        color: #333;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /**
+      .country .flag:after {
         @apply --scrim-up;
 
+        opacity: 0.3;
         content: "";
         display: block;
         position: absolute;
@@ -60,23 +77,19 @@
         width: 100%;
         height: 100%;
       }
-
-      flag-icon {
-        height: 100%;
-        width: 100%;
-      }
+      **/
     </style>
 
     <h2>Countries</h2>
     <div class="loader" hidden$="[[!_loading]]">fetching countries, one sec.</div>
     <div class="countries">
       <template is="dom-repeat" items="[[_countries]]" as="country">
-        <a href$="/countries/[[country.name]]">
-          <paper-card class="country"
-            image="../../../bower_components/flag-icon-css/flags/4x3/[[country.countryCode]].svg"
-            alt="the flag of [[country.name]]"
-            heading="[[country.name]]">
-          </paper-card>
+        <a href$="/countries/[[country.name]]" class="country">
+          <div class="flag">
+            <img src="../../../bower_components/flag-icon-css/flags/1x1/[[country.countryCode]].svg"
+              alt$="flag of [[country.name]]"/>
+          </div>
+          <div class="name">[[country.name]]</div>
         </a>
       </template>
     </div>
