@@ -2,7 +2,7 @@
 <link rel="import" href="../../../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../../stores/stores.html">
 
-<dom-module id="ah-country">
+<dom-module id="ah-countries-detail">
   <template>
     <style>
       :host {
@@ -14,9 +14,9 @@
   </template>
 
   <script>
-    class AhCountry extends Stores.Mixin(Polymer.Element) {
+    class AhCountriesDetail extends Stores.Mixin(Polymer.Element) {
 
-      static get is() { return 'ah-country'; }
+      static get is() { return 'ah-countries-detail'; }
 
       static get properties() {
         return {
@@ -44,6 +44,6 @@
       }
     }
 
-    window.customElements.define(AhCountry.is, AhCountry);
+    window.customElements.define(AhCountriesDetail.is, AhCountriesDetail);
   </script>
 </dom-module

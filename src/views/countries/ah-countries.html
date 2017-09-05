@@ -1,99 +1,38 @@
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../../bower_components/polymer/lib/elements/dom-if.html">
+
 <link rel="import" href="../../../bower_components/paper-card/paper-card.html">
-<link rel="import" href="../../stores/stores.html">
+
+<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
+
 <link rel="import" href="../../shared/styles/ah-styles.html">
-<link rel="import" href="./country/ah-country.html">
+
+<link rel="import" href="./list/ah-countries-list.html">
+<link rel="import" href="./detail/ah-countries-detail.html">
 
 <dom-module id="ah-countries">
   <template>
     <style include="ah-styles">
       :host {
         display: block;
-        --card-width: 44vw;
-      }
-
-      @media (min-width: 540px) {
-        :host {
-          --card-width: 22vw;
-        }
-      }
-
-      @media (min-width: 960px) {
-        :host {
-          --card-width: 15vw;
-        }
-      }
-
-      .loader {
-        width: 100%;
-      }
-
-      [hidden] {
-        display: none !important;
-      }
-
-      .countries {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-      }
-
-
-      .country {
-        --paper-card-header-color: white;
-        display: flex;
-        flex-wrap: wrap;
-        width: var(--card-width);
-        height: calc((var(--card-width) * 0.75) - 1px); /* aspect ratio 4/3 rounded one pixel down */
-        margin: 8px 0;
-
-        --paper-card-header-text: {
-          @apply --paper-card-header-text;
-          z-index: 1;
-        }
-      }
-
-      .country:after {
-        @apply --scrim-up;
-
-        content: "";
-        display: block;
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 100%;
-      }
-
-      flag-icon {
-        height: 100%;
-        width: 100%;
       }
     </style>
 
     <app-route
       pattern="/:country"
       route="{{route}}"
-      data="{{_routeData}}"></app-route>
+      data="{{_routeData}}"
+      active="{{_countryActive}}"
+      id="route"></app-route>
 
-    <h2>Countries</h2>
-    <div class="countries" hidden$="[[_has(_routeData.country)]]">
-      <div class="loader" hidden$="[[!_loading]]">fetching countries, one sec.</div>
-      <template is="dom-repeat" items="[[_countries]]" as="country">
-        <a href$="/countries/[[country.name]]">
-          <paper-card class="country"
-            image="../../../bower_components/flag-icon-css/flags/4x3/[[country.countryCode]].svg"
-            alt="the flag of [[country.name]]"
-            heading="[[country.name]]">
-          </paper-card>
-        </a>
-      </template>
-    </div>
-    <template is="dom-if" if="[[_routeData.country]]">
-      <ah-country name="[[_routeData.country]]"></ah-country>
-    </template>
+    <iron-pages
+      selected="[[_page]]"
+      attr-for-selected="id"
+      role="main">
+      <ah-countries-list id="list"></ah-countries-list>
+      <ah-countries-detail id="detail" name="[[_routeData.country]]"></ah-countries-detail>
+    </iron-pages>
   </template>
 
   <script>
@@ -108,28 +47,24 @@
               type: Object,
               notifies: true
             },
+            _page: {
+              type: String,
+              computed: '_getPage(_countryActive, _routeData.country)'
+            },
             _subroute: Object,
             _routeData: Object,
-            _countries: Array,
-            _loading: Boolean
+            _countryActive: Boolean
           }
+        }
+
+        _getPage(active, country) {
+          return active && this._routeData.country ? 'detail' : 'list';
         }
 
         connectedCallback() {
           super.connectedCallback();
-          this._dispatch(Stores.Countries.hydrate());
-        }
-
-        _mapStateToProps({countries}) {
-          return {
-            _countries: countries.items,
-            _loading: countries.loading
-          };
-        }
-
-        // the limits of the current template engine...
-        _has(value) {
-          return !!value;
+          this.$.route.addEventListener('route-changed', () => console.log('route-changed'));
+          this.$.route.addEventListener('data-changed', () => console.log('data-changed'));
         }
       }
 

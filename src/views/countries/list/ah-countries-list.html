@@ -1,0 +1,114 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../../stores/stores.html">
+<link rel="import" href="../../../shared/styles/ah-styles.html">
+
+<dom-module id="ah-countries-list">
+  <template>
+    <style include="ah-styles">
+      :host {
+        display: block;
+        --card-width: 44vw;
+      }
+
+      @media (min-width: 540px) {
+        :host {
+          --card-width: 22vw;
+        }
+      }
+
+      @media (min-width: 960px) {
+        :host {
+          --card-width: 15vw;
+        }
+      }
+
+      .loader {
+        width: 100%;
+      }
+
+      .countries {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      .country {
+        --paper-card-header-color: white;
+        display: flex;
+        flex-wrap: wrap;
+        width: var(--card-width);
+        height: calc((var(--card-width) * 0.75) - 1px); /* aspect ratio 4/3 rounded one pixel down */
+        margin: 8px 0;
+
+        --paper-card-header-text: {
+          @apply --paper-card-header-text;
+          z-index: 1;
+        }
+      }
+
+      .country:after {
+        @apply --scrim-up;
+
+        content: "";
+        display: block;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      flag-icon {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+    <h2>Countries</h2>
+    <div class="loader" hidden$="[[!_loading]]">fetching countries, one sec.</div>
+    <div class="countries">
+      <template is="dom-repeat" items="[[_countries]]" as="country">
+        <a href$="/countries/[[country.name]]">
+          <paper-card class="country"
+            image="../../../bower_components/flag-icon-css/flags/4x3/[[country.countryCode]].svg"
+            alt="the flag of [[country.name]]"
+            heading="[[country.name]]">
+          </paper-card>
+        </a>
+      </template>
+    </div>
+  </template>
+
+  <script>
+    (() => {
+      class AhCountriesList extends Stores.Mixin(Polymer.Element) {
+
+        static get is() { return 'ah-countries-list'; }
+
+        static get properties() {
+          return {
+            _countries: Array,
+            _loading: Boolean
+          }
+        }
+
+        connectedCallback() {
+          super.connectedCallback();
+          this._dispatch(Stores.Countries.hydrate());
+        }
+
+        _mapStateToProps({countries}) {
+          return {
+            _countries: countries.items,
+            _loading: countries.loading
+          };
+        }
+      }
+
+      window.customElements.define(AhCountriesList.is, AhCountriesList);
+    })();
+  </script>
+</dom-module>
