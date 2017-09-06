@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/polymer/lib/elements/dom-repeat.html">
 
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
 <link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
@@ -62,9 +63,21 @@
       }
 
       .menu a {
+        color: black;
         display: block;
         text-decoration: none;
         padding: 12px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      .menu a[selected] {
+        background: hotpink;
+      }
+
+      .menu a:active, .menu a:hover, .menu a:focus {
+        text-decoration: none;
+        color: black;
+        outline: none;
       }
     </style>
 
@@ -85,9 +98,15 @@
 
     <app-drawer id="drawer" swipe-open>
       <div class="menu" role="menu">
-        <template is="dom-repeat" items="[[_menuItems]]" as="menuitem">
-          <a href$="[[menuitem.id]]" role="menuitem">[[menuitem.name]]</a>
-        </template>
+        <iron-selector
+          attr-for-selected="href"
+          selected="[[_route.path]]"
+          selected-attribute="selected"
+          selectable="a[role=menuitem]">
+          <template is="dom-repeat" items="[[_menuItems]]" as="menuitem">
+            <a href$="/[[menuitem.id]]" role="menuitem">[[menuitem.name]]</a>
+          </template>
+        </iron-selector>
       </div>
     </app-drawer>
 
