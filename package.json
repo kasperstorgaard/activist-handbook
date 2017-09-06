@@ -12,8 +12,10 @@
     "build:w": "npm run build/stores -s -- --watch",
     "postinstall": "./node_modules/.bin/bower instal",
     "serve": "./node_modules/.bin/polymer serve",
-    "test": "jest",
-    "test:w": "npm run test -- --watch"
+    "test/stores": "jest",
+    "test/stores:w": "npm run test/stores -- --watch",
+    "test": "npm run test/stores",
+    "test:w": "npm run test/stores:w"
   },
   "dependencies": {
     "redux": "^3.7.2",
