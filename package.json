@@ -10,6 +10,7 @@
     "build/stores:w": "npm run build/stores -s -- --watch",
     "build": "npm run build/stores",
     "build:w": "npm run build/stores -s -- --watch",
+    "postinstall": "./node_modules/.bin/bower instal",
     "serve": "./node_modules/.bin/polymer serve",
     "test": "jest",
     "test:w": "npm run test -- --watch"
@@ -25,6 +26,7 @@
   "devDependencies": {
     "babel-jest": "^20.0.3",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
+    "bower": "^1.8.0",
     "chalk": "^2.1.0",
     "chokidar": "^1.7.0",
     "express": "^4.15.4",
