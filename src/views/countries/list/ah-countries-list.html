@@ -110,7 +110,7 @@
 
         connectedCallback() {
           super.connectedCallback();
-          this._dispatch(Stores.Countries.hydrate());
+          this._dispatch(Stores.Countries.all());
         }
 
         _mapStateToProps({countries}) {
