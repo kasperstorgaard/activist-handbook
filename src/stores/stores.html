@@ -1839,19 +1839,24 @@
    * @param {object} variables The variables needed for the query.
    * @returns {Promise} The returned data.
    */
-  async function query (query, variables) {
+  async function query(query, variables) {
     const body = JSON.stringify({
       query,
       variables: variables || {}
     });
   
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body
-    });
+    let response;
+    try {
+      response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body
+      });
+    } catch(e) {
+     throw new Error('graphql endpoint failed');
+    }
   
     const result = await response.json();
     return result.data;
@@ -1860,11 +1865,12 @@
   // Types
   const INIT = 'country/INIT';
   const LOAD = 'country/LOAD';
-  const types = {INIT, LOAD};
+  const FAIL = 'country/FAIL';
   
   // Actions
   const init = createAction(INIT);
   const load = createAction(LOAD);
+  const fail = createAction(FAIL);
   
   async function getData(name) {
     const data = await query(
@@ -1884,28 +1890,36 @@
   function get(name) {
     return async dispatch => {
       dispatch(init());
-      const data = await getData(name);
-      dispatch(load(data));
+      try {
+        const data = await getData(name);
+        dispatch(load(data));
+      } catch(e) {
+        dispatch(fail());
+      }
     }
   }
   
   // State
   const initialState = {
     loading: false,
-    data: null
+    data: null,
+    failed: false
   };
   
   // Reducers
   const reducer = handleActions({
-    [INIT]: (state, {payload}) => Object.assign({}, state, {loading: true }),
-    [LOAD]: (state, {payload}) => Object.assign({}, state, {data: payload, loading: false})
+    [INIT]: (state, {payload}) =>
+      Object.assign({}, state, {loading: true, failed: false}),
+    [LOAD]: (state, {payload}) =>
+      Object.assign({}, state, {data: payload, loading: false}),
+    [FAIL]: (state, {payload}) =>
+      Object.assign({}, state, {data: null, loading: false, failed: true}),
   }, initialState);
   
   
   
   
-  var index = Object.freeze({
-  	types: types,
+  var country = Object.freeze({
   	get: get,
   	reducer: reducer,
   	default: reducer
@@ -1914,14 +1928,15 @@
   // Types
   const INIT$1 = 'countries/INIT';
   const LOAD$1 = 'countries/LOAD';
-  const types$1 = {INIT: INIT$1, LOAD: LOAD$1}; 
+  const FAIL$1 = 'countries/FAIL';
   
   // Actions
   const init$1 = createAction(INIT$1);
   const load$1 = createAction(LOAD$1);
+  const fail$1 = createAction(FAIL$1);
   
-  async function getData$1() {
-    const data = await query(`
+  async function getAll() {
+    const data = await query(`s
     {
       allCountries {
         id
@@ -1934,11 +1949,15 @@
   }
   
   // Operations
-  function hydrate() {
+  function all() {
     return async dispatch => {
       dispatch(init$1());
-      const countries = await getData$1();
-      dispatch(load$1(countries));
+      try {
+        const countries = await getAll();
+        dispatch(load$1(countries));
+      } catch(e) {
+        dispatch(fail$1());
+      }
     };
   }
   
@@ -1950,16 +1969,19 @@
   
   // Reducers
   const reducer$2 = handleActions({
-    [INIT$1]: (state, {payload}) => Object.assign(state, {loading: true}),
-    [LOAD$1]: (state, {payload}) => Object.assign(state, {items: payload, loading: false})
+    [INIT$1]: (state, {payload}) =>
+      Object.assign(state, {loading: true, failed: false}),
+    [LOAD$1]: (state, { payload }) =>
+      Object.assign(state, { items: payload, loading: false}),
+    [FAIL$1]: (state, { payload }) =>
+      Object.assign(state, { items: null, loading: false, failed: true})
   }, initialState$1);
   
   
   
   
-  var index$1 = Object.freeze({
-  	types: types$1,
-  	hydrate: hydrate,
+  var countries = Object.freeze({
+  	all: all,
   	reducer: reducer$2,
   	default: reducer$2
   });
@@ -2556,8 +2578,8 @@
     };
   }
   
-  exports.Country = index;
-  exports.Countries = index$1;
+  exports.Country = country;
+  exports.Countries = countries;
   exports.Root = store;
   exports.Mixin = Mixin;
   
