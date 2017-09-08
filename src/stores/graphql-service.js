@@ -6,7 +6,7 @@ export const endpoint = 'https://api.graph.cool/simple/v1/cj6nyow1w221t0143o8gq0
  * @param {object} variables The variables needed for the query.
  * @returns {Promise} The returned data.
  */
-export async function query (query, variables) {
+export async function query(query, variables) {
   const body = JSON.stringify({
     query,
     variables: variables || {}

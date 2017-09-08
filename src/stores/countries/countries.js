@@ -1,5 +1,5 @@
 import {createAction, handleActions} from 'redux-actions';
-import {query} from '../graphql-service';
+import {query as queryGraphQL} from '../graphql-service';
 
 // Types
 const INIT = 'countries/INIT';
@@ -11,8 +11,8 @@ const init = createAction(INIT);
 const load = createAction(LOAD);
 const fail = createAction(FAIL);
 
-async function getData() {
-  const data = await query(`
+async function getAll() {
+  const data = await queryGraphQL(`s
   {
     allCountries {
       id
@@ -25,11 +25,11 @@ async function getData() {
 }
 
 // Operations
-export function hydrate() {
+export function all() {
   return async dispatch => {
     dispatch(init());
     try {
-      const countries = await getData();
+      const countries = await getAll();
       dispatch(load(countries));
     } catch(e) {
       dispatch(fail())

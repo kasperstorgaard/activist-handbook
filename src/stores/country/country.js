@@ -1,5 +1,5 @@
 import {createAction, handleActions} from 'redux-actions';
-import {query} from '../graphql-service';
+import {query as queryGraphQL} from '../graphql-service';
 
 // Types
 const INIT = 'country/INIT';
@@ -12,7 +12,7 @@ const load = createAction(LOAD);
 const fail = createAction(FAIL);
 
 async function getData(name) {
-  const data = await query(
+  const data = await queryGraphQL(
    `query CountryByName($name: String) {
       Country(name: $name) {
         id
