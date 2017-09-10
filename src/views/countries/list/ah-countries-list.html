@@ -2,6 +2,7 @@
 <link rel="import" href="../../../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../../../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../../stores/stores.html">
 <link rel="import" href="../../../shared/styles/ah-styles.html">
 
@@ -64,23 +65,10 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
-
-      /**
-      .country .flag:after {
-        @apply --scrim-up;
-
-        opacity: 0.3;
-        content: "";
-        display: block;
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 100%;
-      }
-      **/
     </style>
 
     <h2>Countries</h2>
+    <paper-input value="{{_query}}"></paper-input>
     <div class="loader" hidden$="[[!_loading]]">fetching countries, one sec.</div>
     <div class="countries">
       <template is="dom-repeat" items="[[_countries]]" as="country">
@@ -104,8 +92,15 @@
         static get properties() {
           return {
             _countries: Array,
-            _loading: Boolean
+            _loading: Boolean,
+            _query: String
           }
+        }
+
+        static get observers() {
+          return [
+            '_queryCountries(_query)'
+          ]
         }
 
         connectedCallback() {
@@ -113,9 +108,15 @@
           this._dispatch(Stores.Countries.all());
         }
 
+        _queryCountries(query) {
+          this._dispatch(Stores.Countries.query(query));
+        }
+
         _mapStateToProps({countries}) {
+          const {filtered, items} = countries;
+
           return {
-            _countries: countries.items,
+            _countries: filtered.length ? filtered : items,
             _loading: countries.loading
           };
         }
