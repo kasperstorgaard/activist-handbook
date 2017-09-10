@@ -12,7 +12,7 @@
     "build:w": "npm run build/stores -s -- --watch",
     "postinstall": "./node_modules/.bin/bower instal",
     "serve": "./node_modules/.bin/polymer serve",
-    "test": "jest",
+    "test": "jest \"/src/stores/.*\\.spec\\.js\"",
     "test:w": "npm run test -- --watch"
   },
   "dependencies": {
