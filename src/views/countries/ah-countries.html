@@ -60,12 +60,6 @@
         _getPage(active, country) {
           return active && this._routeData.country ? 'detail' : 'list';
         }
-
-        connectedCallback() {
-          super.connectedCallback();
-          this.$.route.addEventListener('route-changed', () => console.log('route-changed'));
-          this.$.route.addEventListener('data-changed', () => console.log('data-changed'));
-        }
       }
 
       window.customElements.define(AhCountries.is, AhCountries);
