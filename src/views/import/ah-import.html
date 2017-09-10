@@ -64,8 +64,6 @@
               const countriesData = JSON.parse(reader.result);
               const countries = await Promise.all(
                 countriesData.map(data => this._createCountry(data)));
-
-              console.log(`${countries.length} countries created.`);
             } catch (e) {
               //
             }
