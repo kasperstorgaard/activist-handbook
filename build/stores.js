@@ -28,20 +28,12 @@ async function build() {
   });
 
   // generate code and a sourcemap
-  const { code, map } = await bundle.generate({
+  await bundle.write({
+    file: join(storesDir, 'stores.built.js'),
     format: 'iife',
-    name: 'Stores'
+    name: 'Stores',
+    sourcemap: true
   });
-
-  const content = 
-  `<script>
-   /** Generated from root.js by build/stores.js **/
-
-   ${code.split(/\n/).join('\n  ')}
-
-  </script>`;
-
-  writeFile(join(storesDir, 'stores.html'), content);
 };
 
 build();
