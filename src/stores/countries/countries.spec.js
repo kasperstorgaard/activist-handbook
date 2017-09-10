@@ -12,11 +12,11 @@ function buildStore() {
 
 function mockResponse() {
   return {
-    allCountries: [{
-      id: 1,
-      name: 'denmark',
-      countryCode: 'DK'
-    }]
+    allCountries: [
+      { id: 1, name: 'denmark', countryCode: 'DK' },
+      { id: 2, name: 'sweden', countryCode: 'SE' },
+      { id: 3, name: 'norway', countryCode: 'NO' }
+    ]
   };
 }
 
@@ -38,81 +38,160 @@ function teardown() {
   nock.cleanAll();
 }
 
-test('hydrate() sets loading to true', async () => {
+test('all() sets loading to true', async () => {
   const store = setup();
 
-  store.dispatch(sut.hydrate());
+  store.dispatch(sut.all());
 
   expect(store.getState().loading).toBe(true);
 
   teardown();
 });
 
-test('hydrate() sets items after response', async () => {
+test('all() sets items after response', async () => {
   const store = setup();
 
-  await store.dispatch(sut.hydrate());
+  await store.dispatch(sut.all());
 
-  expect(store.getState().items).toEqual([{
-    id: 1,
-    name: 'denmark',
-    countryCode: 'DK'
-  }]);
+  expect(store.getState().items).toEqual([
+    { id: 1, name: 'denmark', countryCode: 'DK' },
+    { id: 2, name: 'sweden', countryCode: 'SE' },
+    { id: 3, name: 'norway', countryCode: 'NO' }
+  ]);
 
   teardown();
 });
 
-test('hydrate() sets loading to false after response', async () => {
+test('all() sets loading to false after response', async () => {
   const store = setup();
 
-  await store.dispatch(sut.hydrate());
+  await store.dispatch(sut.all());
 
   expect(store.getState().loading).toBe(false);
 
   teardown();
 });
 
-test('hydrate() sets items=null after failed response', async () => {
+test('all() sets items=null after failed response', async () => {
   const store = buildStore();
   mockAPI({fail: true});
 
-  await store.dispatch(sut.hydrate());
+  await store.dispatch(sut.all());
 
   expect(store.getState().items).toBe(null);
 
   teardown();
 });
 
-test('hydrate() sets loading=false after failed response', async () => {
+test('all() sets loading=false after failed response', async () => {
   const store = buildStore();
   mockAPI({fail: true});
 
-  await store.dispatch(sut.hydrate());
+  await store.dispatch(sut.all());
 
   expect(store.getState().loading).toBe(false);
 
   teardown();
 });
 
-test('hydrate() sets failed=true after failed response', async () => {
+test('all() sets failed=true after failed response', async () => {
   const store = buildStore();
   mockAPI({fail: true});
 
-  await store.dispatch(sut.hydrate());
+  await store.dispatch(sut.all());
 
   expect(store.getState().failed).toBe(true);
 
   teardown();
 });
 
-test('hydrate() sets failed=false after second request', async () => {
+test('all() sets failed=false after second request', async () => {
   const store = buildStore();
   mockAPI({fail: true});
 
-  await store.dispatch(sut.hydrate());
-  store.dispatch(sut.hydrate());
+  await store.dispatch(sut.all());
+  store.dispatch(sut.all());
 
   expect(store.getState().failed).toBe(false);
+
+  teardown();
+});
+
+test('query() sets filtered empty if no items', async () => {
+  const store = setup();
+
+  store.dispatch(sut.query());
+
+  expect(store.getState().filtered).toEqual([]);
+
+  teardown();
+});
+
+test('query() filters items by name', async () => {
+  const store = setup();
+
+  await store.dispatch(sut.all());
+  store.dispatch(sut.query('den'));
+
+  expect(store.getState().filtered).toEqual([
+    {id: 1, name: 'denmark', countryCode: 'DK'},
+    {id: 2, name: 'sweden', countryCode: 'SE'}
+  ]);
+
+  teardown();
+});
+
+test('query() filters items by countryCode', async () => {
+  const store = setup();
+
+  await store.dispatch(sut.all());
+  store.dispatch(sut.query('dk'));
+
+  expect(store.getState().filtered).toEqual([
+    {id: 1, name: 'denmark', countryCode: 'DK'}
+  ]);
+
+  teardown();
+});
+
+test('query() sorts equal name matches by alphabet', async () => {
+  const store = buildStore();
+  const data = {
+    allCountries: [
+      {id: 1, name: 'serbia', countryCode: 'RS'},
+      {id: 2, name: 'senegal', countryCode: 'SN'}
+    ]
+  };
+  mockAPI({data});
+
+  await store.dispatch(sut.all());
+  store.dispatch(sut.query('se'));
+
+  expect(store.getState().filtered).toEqual([
+    {id: 2, name: 'senegal', countryCode: 'SN'},
+    {id: 1, name: 'serbia', countryCode: 'RS'}
+  ]);
+
+  teardown();
+});
+
+test('query() ranks countryCode matches before name matches', async () => {
+  const store = buildStore();
+  const data = {
+    allCountries: [
+      {id: 1, name: 'serbia', countryCode: 'RS'},
+      {id: 2, name: 'sweden', countryCode: 'SE'}
+    ]
+  };
+  mockAPI({data});
+
+  await store.dispatch(sut.all());
+  store.dispatch(sut.query('se'));
+
+  expect(store.getState().filtered).toEqual([
+    {id: 2, name: 'sweden', countryCode: 'SE'},
+    {id: 1, name: 'serbia', countryCode: 'RS'}
+  ]);
 
   teardown();
 });
