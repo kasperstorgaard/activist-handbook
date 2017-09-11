@@ -68,7 +68,7 @@
     </style>
 
     <h2>Countries</h2>
-    <paper-input value="{{_query}}"></paper-input>
+    <paper-input value="{{_query}}" placeholder="Type here to filter countries"></paper-input>
     <div class="loader" hidden$="[[!_loading]]">fetching countries, one sec.</div>
     <div class="countries">
       <template is="dom-repeat" items="[[_countries]]" as="country">
