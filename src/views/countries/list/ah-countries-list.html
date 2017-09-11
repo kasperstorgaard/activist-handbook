@@ -99,7 +99,7 @@
 
         static get observers() {
           return [
-            '_queryCountries(_query)'
+            '_queryCountriesDebounced(_query)'
           ]
         }
 
@@ -110,6 +110,13 @@
 
         _queryCountries(query) {
           this._dispatch(Stores.Countries.query(query));
+        }
+
+        _queryCountriesDebounced(query) {
+          clearTimeout(this.__queryRef);
+
+          this.__queryRef = setTimeout(() =>
+            this._dispatch(Stores.Countries.query(query)), 50);
         }
 
         _mapStateToProps({countries}) {
