@@ -15,7 +15,7 @@ function mockApi() {
     Country: {
       id: 1,
       name: 'denmark',
-      countryCode: 'DK'
+      codeAlpha2: 'DK'
     }
   };
 
@@ -51,7 +51,7 @@ test('get() sets data after response from endpoint', async () => {
   expect(store.getState().data).toEqual({
     id: 1,
     name: 'denmark',
-    countryCode: 'DK'
+    codeAlpha2: 'DK'
   });
 
   teardown();
