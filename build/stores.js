@@ -38,6 +38,6 @@ async function build() {
 
 build();
 if (argv.watch) {
-  chokidar.watch(join(storesDir, '/**/*.js'), {ignored: /\.spec\.js/})
+  chokidar.watch(join(storesDir, '/**/*.js'), {ignored: /\.(spec|built)\.js/})
     .on('change', (event, path) => build());
 }
