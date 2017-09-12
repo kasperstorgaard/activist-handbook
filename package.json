@@ -9,9 +9,9 @@
     "build/stores": "node ./build/stores.js",
     "build/stores:w": "npm run build/stores -s -- --watch",
     "build": "npm run build/stores",
-    "build:w": "npm run build/stores -s -- --watch",
+    "build:w": "npm run build/stores -- --watch",
     "postinstall": "./node_modules/.bin/bower instal",
-    "serve": "./node_modules/.bin/polymer serve",
+    "serve": "./node_modules/.bin/polymer serve && npm run build:w",
     "test": "jest \"/src/stores/.*\\.spec\\.js\"",
     "test:w": "npm run test -- --watch"
   },
@@ -21,7 +21,8 @@
     "redux-thunk": "^2.2.0",
     "rollup-plugin-commonjs": "^8.2.0",
     "rollup-plugin-node-globals": "^1.1.0",
-    "rollup-plugin-node-resolve": "^3.0.0"
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "world-countries": "^1.8.1"
   },
   "devDependencies": {
     "babel-jest": "^20.0.3",
