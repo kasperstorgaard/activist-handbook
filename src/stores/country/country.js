@@ -17,6 +17,9 @@ async function getData(name) {
       Country(name: $name) {
         id
         name
+        codeAlpha3
+        latitude
+        longitude
       }
     }`,
     {name}
