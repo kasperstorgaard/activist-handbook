@@ -1,5 +1,6 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../../../bower_components/google-map/google-map.html">
 <link rel="import" href="../../../stores/stores.html">
 
 <dom-module id="ah-countries-detail">
@@ -10,6 +11,9 @@
       }
     </style>
     <h2>[[_country.name]]</h2>
+    <google-map id="gmap"
+      api-key="AIzaSyBnrtKnpBOG4PT063JAjHK5IP2LUF2fNm8"
+      fit-to-markers></google-map>
   </template>
 
   <script>
@@ -27,8 +31,21 @@
           _country: {
             type: Object,
             value: () => ({ name: null })
-          }
+          },
+          _mapReady: Object
         }
+      }
+
+      static get observers() {
+        return [
+          '_loadGeoJSON(_mapReady, _country.codeAlpha3)'
+        ];
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+
+        this.$.gmap.addEventListener('google-map-ready', () => this._mapReady = true);
       }
 
       _nameChanged(name) {
@@ -40,6 +57,13 @@
           _loading: country.loading,
           _country: country.data
         };
+      }
+
+      _loadGeoJSON(ready, code) {
+        if (!ready || !code) {
+          return;
+        }
+        this.$.gmap.map.data.loadGeoJson(`node_modules/world-countries/data/${code}.geo.json`);
       }
     }
 
