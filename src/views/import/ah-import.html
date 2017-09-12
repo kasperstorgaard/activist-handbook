@@ -7,15 +7,39 @@
       :host {
         display: block;
       }
+
+      [hidden] {
+        display: none !important;
+      }
     </style>
     <h2>Import</h2>
     <paper-input id="upload" type="file" accept=".json"></paper-input>
+    <div hidden$="[[!_uploading]]">
+      <div>uploading...</div>
+      <div>[[_progress]]%</div>
+    </div>
   </template>
 
   <script>
     (() => {
       class AhImport extends Polymer.Element {
         static get is() { return 'ah-import'; }
+
+        static get properties() {
+          return {
+            _uploadingItems: Array,
+            _uplading: {
+              type: Boolean,
+              computed: '_getUploading(_uploadingItems.*)',
+              value: false
+            },
+            _errors: Array,
+            _progress: {
+              type: Number,
+              computed: '_getProgress(_uploadingItems.*)'
+            }
+          };
+        }
 
         connectedCallback() {
           super.connectedCallback();
@@ -24,18 +48,22 @@
           input.addEventListener('change', () => {
             this._upload(input.files);
           });
-
         }
 
-        async _createCountry({name, countryCode}) {
+        async _createCountry(data) {
           const endpoint = 'https://api.graph.cool/simple/v1/cj6nyow1w221t0143o8gq0f9p';
 
           const query =
             `mutation {
                 createCountry(
-                  name: "${name}"
+                  name: "${data.name}"
                   description: "test"
-                  countryCode: "${countryCode}"
+                  codeAlpha2: "${data.codeAlpha2}"
+                  codeAlpha3: "${data.codeAlpha3}"
+                  region: "${data.region}"
+                  subRegion: "${data.subRegion}"
+                  latitude: ${data.latitude}
+                  longitude: ${data.longitude}
                 ) {
                   id
                   name
@@ -62,14 +90,48 @@
           reader.addEventListener("load", async () => {
             try {
               const countriesData = JSON.parse(reader.result);
-              const countries = await Promise.all(
-                countriesData.map(data => this._createCountry(data)));
+
+              this._uploadingItems = countriesData.map(data => {
+                const item = { done: false, errors: [] };
+                const promise = this._createCountry(data);
+
+                promise.then(
+                  () => item.done = true,
+                  errors => item.errors = errors
+                );
+
+                return item;
+              });
             } catch (e) {
               //
             }
           });
 
           reader.readAsText(files[0]);
+        }
+
+        _getUploading({base}) {
+          if (!base || !base.length) {
+            return false;
+          }
+          return base.some(item => !item.done);
+        }
+
+        _getErrors({base}) {
+          if (!base || !base.length) {
+            return false;
+          }
+          return base.reduce((all, item) => all.concat(item.errors), []);
+        }
+
+        _getProgress({base}) {
+          if (!base || !base.length)
+          {
+            return null;
+          }
+          const total = base.length;
+          const done = base.filter(item => item.done).length;
+          return (done / total) * 100;
         }
       }
 
