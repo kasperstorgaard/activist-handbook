@@ -68,19 +68,20 @@
     </style>
 
     <h2>Countries</h2>
-    <paper-input value="{{_query}}" placeholder="Type here to filter countries"></paper-input>
-    <div class="loader" hidden$="[[!_loading]]">fetching countries, one sec.</div>
+    <paper-input value="{{_query}}" placeholder="Type here to search countries"></paper-input>
     <div class="countries">
       <template is="dom-repeat" items="[[_countries]]" as="country">
         <a href$="/countries/[[country.name]]" class="country">
           <div class="flag">
-            <img src="../../../bower_components/flag-icon-css/flags/1x1/[[country.countryCode]].svg"
+            <img src="bower_components/flag-icon-css/flags/1x1/[[country.codeAlpha2]].svg"
               alt$="flag of [[country.name]]"/>
           </div>
           <div class="name">[[country.name]]</div>
         </a>
       </template>
     </div>
+    <div class="loader" hidden$="[[!_loading]]">fetching countries, one sec.</div>
+    <div class="empty" hidden$="[[!_empty]]">no countries to show, try changing your search</div>
   </template>
 
   <script>
@@ -93,7 +94,11 @@
           return {
             _countries: Array,
             _loading: Boolean,
-            _query: String
+            _query: String,
+            _empty: {
+              type: Boolean,
+              computed: '_computeEmpty(_loading, _query, _countries)'
+            }
           }
         }
 
@@ -123,9 +128,21 @@
           const {filtered, items} = countries;
 
           return {
-            _countries: filtered.length ? filtered : items,
+            _countries: this._query && this._query.length ? filtered : items,
             _loading: countries.loading
           };
+        }
+
+        _computeEmpty(loading, query, countries) {
+          if (loading) {
+            return false;
+          }
+
+          if (!query || !query.length) {
+            return false;
+          }
+
+          return !countries.length;
         }
       }
 
