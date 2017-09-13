@@ -28,13 +28,23 @@ async function getData(name) {
   return data.Country;
 }
 
+async function getGeo(code) {
+  if (!code) {
+    return null;
+  }
+
+  const response = await fetch(`/node_modules/world-countries/data/${code}.geo.json`);
+  return response.json();
+}
+
 // Operations
 export function get(name) {
   return async dispatch => {
     dispatch(init());
     try {
       const data = await getData(name);
-      dispatch(load(data));
+      const geo = await getGeo(data.codeAlpha3);
+      dispatch(load(Object.assign({}, data, {geo})));
     } catch(e) {
       dispatch(fail());
     }
