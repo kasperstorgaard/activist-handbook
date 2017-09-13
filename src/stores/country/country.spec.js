@@ -10,18 +10,26 @@ function buildStore() {
   return createStore(sut.reducer, applyMiddleware(thunk));
 }
 
-function mockApi() {
+function mockApi(options = {}) {
   const data = {
     Country: {
       id: 1,
       name: 'denmark',
-      codeAlpha2: 'DK'
+      codeAlpha2: 'DK',
+      codeAlpha3: 'DNK',
+      region: 'Europe'
     }
   };
 
   nock('https://api.graph.cool')
     .post('/simple/v1/cj6nyow1w221t0143o8gq0f9p')
-    .reply(200, { data });
+    .reply(options.fail ? 500 : 200, options.fail ? undefined : {data});
+
+  const geoJson = {type: 'FeatureCollection', features: []};
+
+  nock('http://localhost')
+    .get(/\.geo\.json/i)
+    .reply(200, {data: geoJson});
 }
 
 function setup() {
@@ -29,18 +37,18 @@ function setup() {
   return buildStore();
 }
 
-function teardown() {
-  nock.cleanAll();
-}
+afterEach(() => nock.cleanAll());
 
 test('get() sets loading=true', async () => {
   const store = setup();
 
-  store.dispatch(sut.get());
+  // this is bc. nock still doesn't clean pending requests.
+  const dispatched = store.dispatch(sut.get());
+  const loading = store.getState().loading;
 
-  expect(store.getState().loading).toBe(true);
+  await dispatched;
 
-  teardown();
+  expect(loading).toBe(true);
 });
 
 test('get() sets data after response from endpoint', async () => {
@@ -51,10 +59,11 @@ test('get() sets data after response from endpoint', async () => {
   expect(store.getState().data).toEqual({
     id: 1,
     name: 'denmark',
-    codeAlpha2: 'DK'
+    codeAlpha2: 'DK',
+    codeAlpha3: 'DNK',
+    region: 'Europe',
+    geo: expect.any(Object)
   });
-
-  teardown();
 });
 
 test('get() sets loading=false after response', async () => {
@@ -63,50 +72,36 @@ test('get() sets loading=false after response', async () => {
   await store.dispatch(sut.get());
 
   expect(store.getState().loading).toBe(false);
-
-  teardown();
 });
 
 test('get() sets data=null when endpoint fails', async () => {
   // we need a custom setup for this test.
   const store = buildStore();
-  nock('https://api.graph.cool')
-    .post('/simple/v1/cj6nyow1w221t0143o8gq0f9p')
-    .reply(500);
+  mockApi({fail: true})
 
   await store.dispatch(sut.get());
 
   expect(store.getState().data).toBe(null)
-
-  teardown();
 });
 
 test('get() sets failed=true when endpoint fails', async () => {
   // we need a custom setup for this test.
   const store = buildStore();
-  nock('https://api.graph.cool')
-    .post('/simple/v1/cj6nyow1w221t0143o8gq0f9p')
-    .reply(500);
+  mockApi({fail: true});
 
   await store.dispatch(sut.get());
 
   expect(store.getState().failed).toBe(true)
-
-  teardown();
 });
 
 test('get() sets failed=false when second request starts', async () => {
   // we need a custom setup for this test.
   const store = buildStore();
-  nock('https://api.graph.cool')
-    .post('/simple/v1/cj6nyow1w221t0143o8gq0f9p')
-    .reply(500);
+  mockApi({fail: true});
 
   await store.dispatch(sut.get());
 
   store.dispatch(sut.get());
 
   expect(store.getState().failed).toBe(false);
-
-  teardown();
 });
