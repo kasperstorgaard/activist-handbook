@@ -34,9 +34,7 @@ function setup() {
   return buildStore();
 }
 
-function teardown() {
-  nock.cleanAll();
-}
+afterEach(() => nock.cleanAll());
 
 test('all() sets loading to true', async () => {
   const store = setup();
@@ -44,8 +42,6 @@ test('all() sets loading to true', async () => {
   store.dispatch(sut.all());
 
   expect(store.getState().loading).toBe(true);
-
-  teardown();
 });
 
 test('all() sets items after response', async () => {
@@ -58,8 +54,6 @@ test('all() sets items after response', async () => {
     { id: 2, name: 'sweden', codeAlpha2: 'SE' },
     { id: 3, name: 'norway', codeAlpha2: 'NO' }
   ]);
-
-  teardown();
 });
 
 test('all() sets loading to false after response', async () => {
@@ -68,8 +62,6 @@ test('all() sets loading to false after response', async () => {
   await store.dispatch(sut.all());
 
   expect(store.getState().loading).toBe(false);
-
-  teardown();
 });
 
 test('all() sets items=null after failed response', async () => {
@@ -79,8 +71,6 @@ test('all() sets items=null after failed response', async () => {
   await store.dispatch(sut.all());
 
   expect(store.getState().items).toBe(null);
-
-  teardown();
 });
 
 test('all() sets loading=false after failed response', async () => {
@@ -90,8 +80,6 @@ test('all() sets loading=false after failed response', async () => {
   await store.dispatch(sut.all());
 
   expect(store.getState().loading).toBe(false);
-
-  teardown();
 });
 
 test('all() sets failed=true after failed response', async () => {
@@ -101,8 +89,6 @@ test('all() sets failed=true after failed response', async () => {
   await store.dispatch(sut.all());
 
   expect(store.getState().failed).toBe(true);
-
-  teardown();
 });
 
 test('all() sets failed=false after second request', async () => {
@@ -113,8 +99,6 @@ test('all() sets failed=false after second request', async () => {
   store.dispatch(sut.all());
 
   expect(store.getState().failed).toBe(false);
-
-  teardown();
 });
 
 test('query() sets filtered empty if no items', async () => {
@@ -123,8 +107,6 @@ test('query() sets filtered empty if no items', async () => {
   store.dispatch(sut.query());
 
   expect(store.getState().filtered).toEqual([]);
-
-  teardown();
 });
 
 test('query() filters items by name', async () => {
@@ -137,8 +119,6 @@ test('query() filters items by name', async () => {
     {id: 1, name: 'denmark', codeAlpha2: 'DK'},
     {id: 2, name: 'sweden', codeAlpha2: 'SE'}
   ]);
-
-  teardown();
 });
 
 test('query() filters items by codeAlpha2', async () => {
@@ -150,8 +130,6 @@ test('query() filters items by codeAlpha2', async () => {
   expect(store.getState().filtered).toEqual([
     {id: 1, name: 'denmark', codeAlpha2: 'DK'}
   ]);
-
-  teardown();
 });
 
 test('query() sorts equal name matches by alphabet', async () => {
@@ -171,8 +149,6 @@ test('query() sorts equal name matches by alphabet', async () => {
     {id: 2, name: 'senegal', codeAlpha2: 'SN'},
     {id: 1, name: 'serbia', codeAlpha2: 'RS'}
   ]);
-
-  teardown();
 });
 
 test('query() ranks codeAlpha2 matches before name matches', async () => {
@@ -192,6 +168,4 @@ test('query() ranks codeAlpha2 matches before name matches', async () => {
     {id: 2, name: 'sweden', codeAlpha2: 'SE'},
     {id: 1, name: 'serbia', codeAlpha2: 'RS'}
   ]);
-
-  teardown();
 });
