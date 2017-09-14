@@ -22,7 +22,7 @@ export async function query(query, variables) {
       body
     });
   } catch(e) {
-   throw new Error('graphql endpoint failed');
+    throw new Error('graphql endpoint failed');
   }
 
   const result = await response.json();
