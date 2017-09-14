@@ -39,15 +39,14 @@
             type: Object,
             value: () => ({ name: null })
           },
-          _geoJson: Object,
-          _map: Object
+          _map: Object,
+          _feature: Object
         }
       }
 
       static get observers() {
         return [
-          '_updateMap(_map, _geoJson)',
-          '_loadGeoJson(_country.codeAlpha3)'
+          '_updateMap(_map, _country.geo)'
         ];
       }
 
@@ -70,34 +69,24 @@
 
       _setupMap() {
         this._map = this.$.gmap.map;
-      }
 
-      async _loadGeoJson(code) {
-        if (!code) {
-          this._geoJson = null;
-          return;
-        }
-
-        const response = await fetch(`node_modules/world-countries/data/${code}.geo.json`);
-        this._geoJson = await response.json();
-      }
-
-      _updateMap(map, data) {
-        if (!map || !data) {
-          return;
-        }
-
-        // clear any existing data layers, since we are reusing the map object.
-        map.data.forEach(d => map.data.remove(d));
-
-        // load the outline data from geojson.
-        map.data.addGeoJson(data);
-        map.data.setStyle({
+        this._map.data.setStyle({
           fillColor: '#222222',
           strokeWeight: 1
         });
+      }
 
-        // zoom bounds to feature
+      _updateMap(map, geoJson) {
+        if (!map || !geoJson) {
+          return;
+        }
+
+        if (this._feature) {
+          map.data.remove(this._feature);
+        }
+
+        this._feature = map.data.addGeoJson(geoJson)[0];
+
         const bounds = new google.maps.LatLngBounds();
         map.data.forEach(feature =>
           feature.getGeometry().forEachLatLng(latlng => bounds.extend(latlng)));
