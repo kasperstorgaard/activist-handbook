@@ -11,7 +11,8 @@
     "build": "npm run build/stores",
     "build:w": "npm run build/stores -- --watch",
     "postinstall": "./node_modules/.bin/bower instal",
-    "serve": "./node_modules/.bin/polymer serve && npm run build:w",
+    "server": "./node_modules/.bin/polymer serve",
+    "serve": "./node_modules/.bin/concurrently \"npm run server\" \"npm run build:w\"",
     "test": "jest \"/src/stores/.*\\.spec\\.js\"",
     "test:w": "npm run test -- --watch"
   },
@@ -30,6 +31,7 @@
     "bower": "^1.8.0",
     "chalk": "^2.1.0",
     "chokidar": "^1.7.0",
+    "concurrently": "^3.5.0",
     "express": "^4.15.4",
     "jest": "^20.0.4",
     "nock": "^9.0.14",
@@ -37,7 +39,7 @@
     "polymer-cli": "^1.5.4",
     "rollup": "^0.49.2",
     "rollup-plugin-node-builtins": "^2.1.2",
-    "testdouble": "^3.2.4",
+    "testdouble": "^3.2.5",
     "yargs": "^8.0.2"
   }
 }

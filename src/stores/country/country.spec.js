@@ -1,9 +1,9 @@
-import nock from 'nock';
+import td from 'testdouble';
 import {createStore, applyMiddleware} from 'redux';
 import thunk from 'redux-thunk';
 import * as sut from './country';
 
-import fetch from 'node-fetch';
+const fetch = td.function();
 global.fetch = fetch;
 
 function buildStore() {
@@ -21,15 +21,18 @@ function mockApi(options = {}) {
     }
   };
 
-  nock('https://api.graph.cool')
-    .post('/simple/v1/cj6nyow1w221t0143o8gq0f9p')
-    .reply(options.fail ? 500 : 200, options.fail ? undefined : {data});
+  const target = td.when(fetch(td.matchers.contains('//api.graph.cool'), td.matchers.anything()));
+
+  if (!options.fail) {
+    target.thenResolve({json: async() => ({data})});
+  } else {
+    target.thenReject();
+  }
 
   const geoJson = {type: 'FeatureCollection', features: []};
 
-  nock('http://localhost')
-    .get(/\.geo\.json/i)
-    .reply(200, {data: geoJson});
+  td.when(fetch(td.matchers.contains('.geo.json')))  
+    .thenResolve({json: async() => ({data: geoJson})});
 }
 
 function setup() {
@@ -37,18 +40,14 @@ function setup() {
   return buildStore();
 }
 
-afterEach(() => nock.cleanAll());
+afterEach(() => td.reset());
 
 test('get() sets loading=true', async () => {
   const store = setup();
 
-  // this is bc. nock still doesn't clean pending requests.
-  const dispatched = store.dispatch(sut.get());
-  const loading = store.getState().loading;
+  store.dispatch(sut.get());
 
-  await dispatched;
-
-  expect(loading).toBe(true);
+  expect(store.getState().loading).toBe(true);
 });
 
 test('get() sets data after response from endpoint', async () => {

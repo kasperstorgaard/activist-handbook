@@ -1,9 +1,9 @@
-import nock from 'nock';
+import td from 'testdouble';
 import {createStore, applyMiddleware} from 'redux';
 import thunk from 'redux-thunk';
 import * as sut from './countries';
 
-import fetch from 'node-fetch';
+const fetch = td.function();
 global.fetch = fetch;
 
 function buildStore() {
@@ -24,9 +24,13 @@ function mockAPI(options = {}) {
   const fail = options.fail;
   const data = options.data || mockResponse();
 
-  nock('https://api.graph.cool')
-    .post('/simple/v1/cj6nyow1w221t0143o8gq0f9p')
-    .reply(fail ? 500 : 200, !fail ? { data } : undefined);
+  const target = td.when(fetch(td.matchers.contains('//api.graph.cool'), td.matchers.anything()));
+
+  if (!fail) {
+      target.thenResolve({json: async() => ({data})});
+  } else {
+      target.thenReject();
+  }
 }
 
 function setup() {
@@ -34,7 +38,7 @@ function setup() {
   return buildStore();
 }
 
-afterEach(() => nock.cleanAll());
+afterEach(() => td.reset());
 
 test('all() sets loading to true', async () => {
   const store = setup();
