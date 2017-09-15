@@ -17,9 +17,8 @@ async function getData(name) {
       Country(name: $name) {
         id
         name
-        codeAlpha3
-        latitude
-        longitude
+        code
+        position
       }
     }`,
     {name}
@@ -43,7 +42,7 @@ export function get(name) {
     dispatch(init());
     try {
       const data = await getData(name);
-      const geo = await getGeo(data.codeAlpha3);
+      const geo = await getGeo(data.code[1]);
       dispatch(load(Object.assign({}, data, {geo})));
     } catch(e) {
       dispatch(fail());

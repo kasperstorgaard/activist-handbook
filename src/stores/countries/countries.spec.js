@@ -13,9 +13,9 @@ function buildStore() {
 function mockResponse() {
   return {
     allCountries: [
-      { id: 1, name: 'denmark', codeAlpha2: 'DK' },
-      { id: 2, name: 'sweden', codeAlpha2: 'SE' },
-      { id: 3, name: 'norway', codeAlpha2: 'NO' }
+      { id: 1, name: 'denmark', code: ['DK', 'DNK'] },
+      { id: 2, name: 'sweden', code: ['SE', 'SWE'] },
+      { id: 3, name: 'norway', code: ['NO', 'NOR'] }
     ]
   };
 }
@@ -54,9 +54,9 @@ test('all() sets items after response', async () => {
   await store.dispatch(sut.all());
 
   expect(store.getState().items).toEqual([
-    { id: 1, name: 'denmark', codeAlpha2: 'DK' },
-    { id: 2, name: 'sweden', codeAlpha2: 'SE' },
-    { id: 3, name: 'norway', codeAlpha2: 'NO' }
+    { id: 1, name: 'denmark', code: ['DK', 'DNK'] },
+    { id: 2, name: 'sweden', code: ['SE', 'SWE'] },
+    { id: 3, name: 'norway', code: ['NO', 'NOR'] }
   ]);
 });
 
@@ -120,19 +120,19 @@ test('query() filters items by name', async () => {
   store.dispatch(sut.query('den'));
 
   expect(store.getState().filtered).toEqual([
-    {id: 1, name: 'denmark', codeAlpha2: 'DK'},
-    {id: 2, name: 'sweden', codeAlpha2: 'SE'}
+    {id: 1, name: 'denmark', code: ['DK', 'DNK']},
+    {id: 2, name: 'sweden', code: ['SE', 'SWE']}
   ]);
 });
 
-test('query() filters items by codeAlpha2', async () => {
+test('query() filters items by code[0]', async () => {
   const store = setup();
 
   await store.dispatch(sut.all());
   store.dispatch(sut.query('dk'));
 
   expect(store.getState().filtered).toEqual([
-    {id: 1, name: 'denmark', codeAlpha2: 'DK'}
+    {id: 1, name: 'denmark', code: ['DK', 'DNK']}
   ]);
 });
 
@@ -140,8 +140,8 @@ test('query() sorts equal name matches by alphabet', async () => {
   const store = buildStore();
   const data = {
     allCountries: [
-      {id: 1, name: 'serbia', codeAlpha2: 'RS'},
-      {id: 2, name: 'senegal', codeAlpha2: 'SN'}
+      {id: 1, name: 'serbia', code: ['RS', 'SRB']},
+      {id: 2, name: 'senegal', code: ["SN", "SEN"]}
     ]
   };
   mockAPI({data});
@@ -150,17 +150,17 @@ test('query() sorts equal name matches by alphabet', async () => {
   store.dispatch(sut.query('se'));
 
   expect(store.getState().filtered).toEqual([
-    {id: 2, name: 'senegal', codeAlpha2: 'SN'},
-    {id: 1, name: 'serbia', codeAlpha2: 'RS'}
+    {id: 2, name: 'senegal', code: ["SN", "SEN"]},
+    {id: 1, name: 'serbia', code: ["RS", "SRB"]}
   ]);
 });
 
-test('query() ranks codeAlpha2 matches before name matches', async () => {
+test('query() ranks code[0] matches before name matches', async () => {
   const store = buildStore();
   const data = {
     allCountries: [
-      {id: 1, name: 'serbia', codeAlpha2: 'RS'},
-      {id: 2, name: 'sweden', codeAlpha2: 'SE'}
+      {id: 1, name: 'serbia', code: ["RS", "SRB"]},
+      {id: 2, name: 'sweden', code: ['SE', 'SWE']}
     ]
   };
   mockAPI({data});
@@ -169,7 +169,7 @@ test('query() ranks codeAlpha2 matches before name matches', async () => {
   store.dispatch(sut.query('se'));
 
   expect(store.getState().filtered).toEqual([
-    {id: 2, name: 'sweden', codeAlpha2: 'SE'},
-    {id: 1, name: 'serbia', codeAlpha2: 'RS'}
+    {id: 2, name: 'sweden', code: ['SE', 'SWE']},
+    {id: 1, name: 'serbia', code: ["RS", "SRB"]}
   ]);
 });

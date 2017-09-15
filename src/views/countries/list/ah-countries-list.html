@@ -73,7 +73,7 @@
       <template is="dom-repeat" items="[[_countries]]" as="country">
         <a href$="/countries/[[country.name]]" class="country">
           <div class="flag">
-            <img src="bower_components/flag-icon-css/flags/1x1/[[country.codeAlpha2]].svg"
+            <img src="bower_components/flag-icon-css/flags/1x1/[[country.code.0]].svg"
               alt$="flag of [[country.name]]"/>
           </div>
           <div class="name">[[country.name]]</div>

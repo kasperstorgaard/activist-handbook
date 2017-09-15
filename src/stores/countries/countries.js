@@ -19,7 +19,7 @@ async function getAll() {
     allCountries {
       id
       name
-      codeAlpha2
+      code
     }
   }
   `);
@@ -47,7 +47,7 @@ const initialState = {
 };
 
 function rankItem(item, query) {
-  if (item.codeAlpha2.toLowerCase() === query) {
+  if (item.code[0].toLowerCase() === query) {
     return 0;
   }
   const nameRank = item.name.toLowerCase().indexOf(query);
