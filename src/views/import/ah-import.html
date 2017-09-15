@@ -53,17 +53,17 @@
         async _createCountry(data) {
           const endpoint = 'https://api.graph.cool/simple/v1/cj6nyow1w221t0143o8gq0f9p';
 
+          const regions = data.regions != null ? `["${data.regions.join('", "')}"]` : null;
+          const code = data.code != null ? `["${data.code.join('", "')}"]` : null;
+          const position = data.position != null ? `[${data.position.join(', ')}]` : null;
+
           const query =
             `mutation {
                 createCountry(
                   name: "${data.name}"
-                  description: "test"
-                  codeAlpha2: "${data.codeAlpha2}"
-                  codeAlpha3: "${data.codeAlpha3}"
-                  region: "${data.region}"
-                  subRegion: "${data.subRegion}"
-                  latitude: ${data.latitude}
-                  longitude: ${data.longitude}
+                  code: ${code}
+                  regions: ${regions}
+                  position: ${position}
                 ) {
                   id
                   name
