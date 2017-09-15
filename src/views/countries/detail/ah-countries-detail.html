@@ -10,17 +10,44 @@
         display: block;
       }
 
+      .map {
+        display: flex;
+        height: 370px;
+        background: white;
+      }
+
+      .news {
+        width: 33vw;
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+      }
+
+      .news > li {
+        display: block;
+        height: 4em;
+        border-bottom: 1px solid #dedede;
+        padding: 0;
+      }
+
       #gmap {
-        height: 300px;
+        width: 67vw;
       }
     </style>
     <h2>[[_country.name]]</h2>
-    <google-map id="gmap"
-      api-key="AIzaSyBnrtKnpBOG4PT063JAjHK5IP2LUF2fNm8"
-      latitude="[[_country.latitude]]"
-      longitude="[[_country.longitude]]"
-      zoom="3"
-      fit-to-markers></google-map>
+    <div class="map">
+      <ul class="news">
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+      <google-map id="gmap"
+        api-key="AIzaSyBnrtKnpBOG4PT063JAjHK5IP2LUF2fNm8"
+        latitude="[[_country.latitude]]"
+        longitude="[[_country.longitude]]"
+        zoom="3"
+        fit-to-markers></google-map>
+    </div>
   </template>
 
   <script>
