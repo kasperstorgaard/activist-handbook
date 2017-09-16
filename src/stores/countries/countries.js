@@ -34,7 +34,7 @@ export function all() {
       const countries = await getAll();
       dispatch(load(countries));
     } catch(e) {
-      dispatch(fail())
+      dispatch(fail());
     }
   };
 }
