@@ -47,9 +47,7 @@ export function upload(countries) {
       try {
         await createCountry(country);
         await dispatch(uploadDone());
-        console.log('done');
       } catch(error) {
-        console.log('error', error);
         await dispatch(uploadError(error));
         throw error;
       }
@@ -94,7 +92,6 @@ export default reducer;
 
 // Helpers
 export function progress(state) {
-  console.log(state);
   const total = state.done + state.errors.length + state.pending;
 
   return Math.floor((state.pending / total) * 100);
