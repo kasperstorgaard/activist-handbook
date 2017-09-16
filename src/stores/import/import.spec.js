@@ -55,10 +55,10 @@ test('upload() sets uploading to true', async () => {
 
   store.dispatch(sut.upload());
 
-  expect(store.getState().loading).toBe(true);
+  expect(store.getState().uploading).toBe(true);
 });
 
-test.only('upload() sets progress to 50 after uploading 1 of 2 files.', async () => {
+test('upload() sets progress to 50 after uploading 1 of 2 files.', async () => {
   // pass in null (instant resolve) and a never resolving promise,
   //  to make sure only 1 fetch gets a response.
   const resolvers = [null, new Promise(res => null)];
