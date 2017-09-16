@@ -94,5 +94,5 @@ export default reducer;
 export function progress(state) {
   const total = state.done + state.errors.length + state.pending;
 
-  return Math.floor((state.pending / total) * 100);
+  return 100 - Math.ceil((state.pending / total) * 100);
 }
