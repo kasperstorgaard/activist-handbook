@@ -2,19 +2,15 @@ import {createAction, handleActions} from 'redux-actions';
 import {query as queryGraphQL} from '../graphql-service';
 
 // Types
-const INIT = 'import/INIT';
-const CREATE = 'import/CREATE';
-const CREATED = 'import/CREATED';
+const RESET = 'import/RESET';
+const START = 'import/START';
+const DONE = 'import/DONE';
 const ERROR = 'import/ERROR';
-const FAILED = 'import/FAILED';
-const SUCCESS = 'import/SUCCESS';
 
-const init = createAction(INIT);
-const uploadStart = createAction(CREATE);
-const uploadDone = createAction(CREATED);
-const uploadError = createAction(ERROR);
-const failed = createAction(FAILED);
-const success = createAction(SUCCESS);
+export const reset = createAction(RESET);
+const start = createAction(START);
+const done = createAction(DONE);
+const error = createAction(ERROR);
 
 async function createCountry(country) {
   const regions = country.regions != null ? `["${country.regions.join('", "')}"]` : null;
@@ -36,28 +32,15 @@ async function createCountry(country) {
 }
 
 // Operations
-export function upload(countries) {
+export function single(country) {
   return async dispatch => {
-    dispatch(init());
-
-    const connections = countries.map(async country =>
-    {
-      await dispatch(uploadStart(country));
-
-      try {
-        await createCountry(country);
-        await dispatch(uploadDone());
-      } catch(error) {
-        await dispatch(uploadError(error));
-        throw error;
-      }
-    });
+    dispatch(start(country));
 
     try {
-      const result = await Promise.all(connections);
-      dispatch(success(result));
-    } catch (errors) {
-      dispatch(failed(errors));
+      const created = await createCountry(country);
+      dispatch(done({ref: country, created}));
+    } catch(msg) {
+      dispatch(error({ref: country, msg}));
     }
   }
 }
@@ -65,26 +48,24 @@ export function upload(countries) {
 // State
 const initialState = {
   errors: [],
-  pending: 0,
-  done: 0,
-  uploading: false,
-  failed: false
+  uploading: [],
+  uploaded: []
 };
 
 // Reducers
 export const reducer = handleActions({
-  [INIT]: (state, {payload}) =>
-    Object.assign({}, state, {uploading: true, failed: false, done: 0, pending: 0, errors: []}),
-  [CREATE]: (state, {payload}) =>
-    Object.assign({}, state, {pending: state.pending + 1}),
-  [CREATED]: (state, {payload}) =>
-    Object.assign({}, state, {pending: state.pending - 1, done: state.done + 1}),
-  [ERROR]: (state, {payload}) =>
-    Object.assign({}, state, {pending: state.pending - 1, errors: state.errors.concat([payload])}),
-  [FAILED]: (state, {payload}) =>
-    Object.assign({}, state, {failed: true, uploading: false}),
-  [SUCCESS]: (state, {payload}) =>
-    Object.assign({}, state, {failed: false, uploading: false})
+  [RESET]: (state, {payload}) =>
+    Object.assign({}, state, {uploading: [], uploaded: [], errors: []}),
+  [START]: (state, {payload}) =>
+    Object.assign({}, state, {uploading: state.uploading.concat([payload])}),
+  [DONE]: (state, {payload}) => Object.assign({}, state, {
+    uploading: state.uploading.filter(item => item !== payload.ref),
+    uploaded: state.uploaded.concat(payload)
+  }),
+  [ERROR]: (state, {payload}) => Object.assign({}, state, {
+    uploading: state.uploading.filter(item => item !== payload.ref),
+    errors: state.errors.concat([payload])
+  })
 }, initialState);
 
 
@@ -92,7 +73,15 @@ export default reducer;
 
 // Helpers
 export function progress(state) {
-  const total = state.done + state.errors.length + state.pending;
+  const total = state.uploaded.length + state.errors.length + state.uploading.length;
 
-  return 100 - Math.ceil((state.pending / total) * 100);
+  return 100 - Math.ceil((state.uploading.length / total) * 100);
+}
+
+export function uploading(state) {
+  return state.uploading.length > 0;
+}
+
+export function failed(state) {
+  return state.errors.length > 0;
 }
