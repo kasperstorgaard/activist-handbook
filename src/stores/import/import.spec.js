@@ -21,6 +21,11 @@ function mockData() {
     "code": ["DZ", "DZA"],
     "regions": ["Africa", "Northern Africa"],
     "position": ["28.033886", "1.659626"]
+  }, {
+    "name": "Andorra",
+    "code": ["AD", "AND"],
+    "regions": ["Europe", "Southern Europe"],
+    "position": ["42.546245", "1.601554"]
   }];
 }
 
@@ -58,10 +63,10 @@ test('upload() sets uploading to true', async () => {
   expect(store.getState().uploading).toBe(true);
 });
 
-test('upload() sets progress to 50 after uploading 1 of 2 files.', async () => {
-  // pass in null (instant resolve) and a never resolving promise,
+test('upload() sets progress to 66 after uploading 2 of 3 files.', async () => {
+  // pass in 2 resolved and a never resolving promise,
   //  to make sure only 1 fetch gets a response.
-  const resolvers = [null, new Promise(res => null)];
+  const resolvers = [Promise.resolve(), Promise.resolve(), new Promise(res => null)];
   mockAPI({resolvers});
   const store = buildStore();
 
@@ -71,7 +76,7 @@ test('upload() sets progress to 50 after uploading 1 of 2 files.', async () => {
   await new Promise(setTimeout);
 
   const state = store.getState();
-  expect(sut.progress(state)).toBe(50);
+  expect(sut.progress(state)).toBe(66);
 });
 
 test('upload() sets uploading to false when done', async () => {
