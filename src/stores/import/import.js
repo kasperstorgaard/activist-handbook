@@ -74,7 +74,7 @@ const initialState = {
 // Reducers
 export const reducer = handleActions({
   [INIT]: (state, {payload}) =>
-    Object.assign({}, state, {loading: true, failed: false, done: 0, pending: 0, errors: []}),
+    Object.assign({}, state, {uploading: true, failed: false, done: 0, pending: 0, errors: []}),
   [CREATE]: (state, {payload}) =>
     Object.assign({}, state, {pending: state.pending + 1}),
   [CREATED]: (state, {payload}) =>
