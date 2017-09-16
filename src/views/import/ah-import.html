@@ -1,5 +1,6 @@
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../stores/stores.html">
 
 <dom-module id="ah-import">
   <template>
@@ -14,30 +15,19 @@
     </style>
     <h2>Import</h2>
     <paper-input id="upload" type="file" accept=".json"></paper-input>
-    <div hidden$="[[!_uploading]]">
-      <div>uploading...</div>
-      <div>[[_progress]]%</div>
-    </div>
+    <div hidden$="[[!_uploading]]">uploading... [[_progress]]</div>
   </template>
 
   <script>
     (() => {
-      class AhImport extends Polymer.Element {
+      class AhImport extends Stores.Mixin(Polymer.Element) {
         static get is() { return 'ah-import'; }
 
         static get properties() {
           return {
-            _uploadingItems: Array,
-            _uplading: {
-              type: Boolean,
-              computed: '_getUploading(_uploadingItems.*)',
-              value: false
-            },
+            _uplading: Boolean,
             _errors: Array,
-            _progress: {
-              type: Number,
-              computed: '_getProgress(_uploadingItems.*)'
-            }
+            _progress: Number
           };
         }
 
@@ -45,43 +35,7 @@
           super.connectedCallback();
 
           const input = this.$.upload.inputElement.querySelector('input');
-          input.addEventListener('change', () => {
-            this._upload(input.files);
-          });
-        }
-
-        async _createCountry(data) {
-          const endpoint = 'https://api.graph.cool/simple/v1/cj6nyow1w221t0143o8gq0f9p';
-
-          const regions = data.regions != null ? `["${data.regions.join('", "')}"]` : null;
-          const code = data.code != null ? `["${data.code.join('", "')}"]` : null;
-          const position = data.position != null ? `[${data.position.join(', ')}]` : null;
-
-          const query =
-            `mutation {
-                createCountry(
-                  name: "${data.name}"
-                  code: ${code}
-                  regions: ${regions}
-                  position: ${position}
-                ) {
-                  id
-                  name
-                }
-              }`;
-
-          const body = JSON.stringify({query});
-
-          const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body
-          });
-
-          const result = await response.json();
-          return result.data;
+          input.addEventListener('change', () => this._upload(input.files));
         }
 
         async _upload(files) {
@@ -90,18 +44,7 @@
           reader.addEventListener("load", async () => {
             try {
               const countriesData = JSON.parse(reader.result);
-
-              this._uploadingItems = countriesData.map(data => {
-                const item = { done: false, errors: [] };
-                const promise = this._createCountry(data);
-
-                promise.then(
-                  () => item.done = true,
-                  errors => item.errors = errors
-                );
-
-                return item;
-              });
+              countriesData.forEach(data => this._dispatch(Stores.Import.upload(data)));
             } catch (e) {
               //
             }
@@ -110,28 +53,12 @@
           reader.readAsText(files[0]);
         }
 
-        _getUploading({base}) {
-          if (!base || !base.length) {
-            return false;
+        _mapStateToProps(state) {
+          return {
+            _uploading: Stores.Import.uploading(state.import),
+            _progress: Stores.Import.progress(state.import),
+            _errors: state.import.errors
           }
-          return base.some(item => !item.done);
-        }
-
-        _getErrors({base}) {
-          if (!base || !base.length) {
-            return false;
-          }
-          return base.reduce((all, item) => all.concat(item.errors), []);
-        }
-
-        _getProgress({base}) {
-          if (!base || !base.length)
-          {
-            return null;
-          }
-          const total = base.length;
-          const done = base.filter(item => item.done).length;
-          return (done / total) * 100;
         }
       }
 
