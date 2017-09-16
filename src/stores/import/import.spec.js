@@ -54,61 +54,57 @@ function setup() {
 
 afterEach(() => td.reset());
 
-test('upload() sets uploading to true', async () => {
+test('uploading() returns true when upload is not done', async () => {
   mockAPI({fail: true});
   const store = buildStore();
 
-  store.dispatch(sut.upload());
+  store.dispatch(sut.single(mockData()[0]));
 
-  expect(store.getState().uploading).toBe(true);
+  const state = store.getState();
+  expect(sut.uploading(store.getState())).toBe(true);
 });
 
-test('upload() sets progress to 66 after uploading 2 of 3 files.', async () => {
-  // pass in 2 resolved and a never resolving promise,
-  //  to make sure only 1 fetch gets a response.
-  const resolvers = [Promise.resolve(), Promise.resolve(), new Promise(res => null)];
-  mockAPI({resolvers});
-  const store = buildStore();
+test('uploading() returns false when done', async () => {
+  const store = setup();
 
-  store.dispatch(sut.upload(mockData()));
+  await store.dispatch(sut.single(mockData()[0]));
 
-  // need to wait for next cycle, since I have found no better way get the right timing.
-  await new Promise(setTimeout);
+  expect(sut.uploading(store.getState())).toBe(false);
+});
+
+test('progress() returns 66 after uploading 2 of 3 files.', async () => {
+  const store = setup();
+
+  await store.dispatch(sut.single(mockData()[0]));
+  await store.dispatch(sut.single(mockData()[1]));
+  store.dispatch(sut.single(mockData()[2]));
 
   const state = store.getState();
   expect(sut.progress(state)).toBe(66);
 });
 
-test('upload() sets uploading to false when done', async () => {
+test('single() adds to uploaded when done', async () => {
   const store = setup();
 
-  await store.dispatch(sut.upload(mockData()));
+  await store.dispatch(sut.single(mockData()[0]));
 
-  expect(store.getState().uploading).toBe(false);
+  expect(store.getState().uploaded.length).toBe(1);
 });
 
-test('upload() sets uploading to false when done', async () => {
-  const store = setup();
-
-  await store.dispatch(sut.upload(mockData()));
-
-  expect(store.getState().uploading).toBe(false);
-});
-
-test('upload() sets uploading to false when failed', async() => {
+test('single() adds to errors when upload fails', async() => {
   mockAPI({fail: true});
   const store = buildStore();
 
-  await store.dispatch(sut.upload(mockData()));
+  await store.dispatch(sut.single(mockData()[0]));
 
-  expect(store.getState().uploading).toBe(false);
+  expect(store.getState().errors.length).toBe(1);
 });
 
-test('upload() sets failed to true when failed', async() => {
+test('reset() resets existing errors', async() => {
   mockAPI({fail: true});
   const store = buildStore();
 
-  await store.dispatch(sut.upload(mockData()));
-
-  expect(store.getState().failed).toBe(true);
+  await store.dispatch(sut.single(mockData()[0]));
+  store.dispatch(sut.reset());
+  expect(store.getState().errors.length).toBe(0);
 });
