@@ -1,0 +1,45 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="ah-news-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+        background: white;
+      }
+
+      ul {
+        padding: 0;
+        margin: 0;
+        list-style-type: none;
+      }
+
+      ul > li {
+        display: block;
+        line-height: 2em;
+        padding: 0 12px;
+        border-bottom: 1px solid #dedede;
+      }
+    </style>
+    <ul>
+      <template is="dom-repeat" items="[[items]]">
+        <li>[[item.title]]</li>
+      </template>
+    </ul>
+  </template>
+
+  <script>
+    class AhNewsList extends Polymer.Element {
+
+      static get is() { return 'ah-news-list'; }
+
+      static get properties() {
+        return {
+          items: Array
+        }
+      }
+    }
+
+    window.customElements.define(AhNewsList.is, AhNewsList);
+  </script>
+</dom-module
