@@ -3,11 +3,13 @@ import ReduxThunk from 'redux-thunk';
 import {reducer as countriesReducer} from './countries/countries';
 import {reducer as countryReducer} from './country/country';
 import {reducer as importReducer} from './import/import';
+import {reducer as newsReducer} from './news/news';
 
 const reducers = {
   countries: countriesReducer,
   country: countryReducer,
-  import: importReducer
+  import: importReducer,
+  news: newsReducer
 };
 
 export const store = createStore(
