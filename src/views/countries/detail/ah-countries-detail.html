@@ -37,9 +37,9 @@
     <h2>[[_country.name]]</h2>
     <div class="map">
       <ul class="news">
-        <li></li>
-        <li></li>
-        <li></li>
+        <template is="dom-repeat" items="[[_news]]">
+          <li>[[item.title]]</li>
+        </template>
       </ul>
       <google-map id="gmap"
         api-key="AIzaSyBnrtKnpBOG4PT063JAjHK5IP2LUF2fNm8"
@@ -84,13 +84,22 @@
       }
 
       _nameChanged(name) {
+        if (name == null) {
+          return;
+        }
         this._dispatch(Stores.Country.get(name));
+        this._dispatch(Stores.News.ByCountry.get(name));
       }
 
-      _mapStateToProps({country}) {
+      _mapStateToProps(state) {
+        const country = state.country.data;
+        const news = country == null ? null :
+          Stores.News.ByCountry.lookup(state.news.byCountry, country.name);
+
         return {
-          _loading: country.loading,
-          _country: country.data
+          _news: news,
+          _loading: state.country.loading,
+          _country: country
         };
       }
 
