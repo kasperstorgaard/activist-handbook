@@ -2,6 +2,7 @@
 <link rel="import" href="../../../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../../../bower_components/google-map/google-map.html">
 <link rel="import" href="../../../stores/stores.html">
+<link rel="import" href="../../../shared/components/ah-news.html">
 
 <dom-module id="ah-countries-detail">
   <template>
@@ -16,18 +17,8 @@
         background: white;
       }
 
-      .news {
+      ah-news {
         width: 33vw;
-        margin: 0;
-        padding: 0;
-        list-style-type: none;
-      }
-
-      .news > li {
-        display: block;
-        height: 4em;
-        border-bottom: 1px solid #dedede;
-        padding: 0;
       }
 
       #gmap {
@@ -36,11 +27,7 @@
     </style>
     <h2>[[_country.name]]</h2>
     <div class="map">
-      <ul class="news">
-        <template is="dom-repeat" items="[[_news]]">
-          <li>[[item.title]]</li>
-        </template>
-      </ul>
+      <ah-news mode="by-country" country="[[name]]"></ah-news>
       <google-map id="gmap"
         api-key="AIzaSyBnrtKnpBOG4PT063JAjHK5IP2LUF2fNm8"
         latitude="[[_country.position.0]]"
@@ -88,16 +75,12 @@
           return;
         }
         this._dispatch(Stores.Country.get(name));
-        this._dispatch(Stores.News.ByCountry.get(name));
       }
 
       _mapStateToProps(state) {
         const country = state.country.data;
-        const news = country == null ? null :
-          Stores.News.ByCountry.items(state.news.byCountry, country.name);
 
         return {
-          _news: news,
           _loading: state.country.loading,
           _country: country
         };
