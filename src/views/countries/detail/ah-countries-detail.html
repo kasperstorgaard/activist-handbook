@@ -94,7 +94,7 @@
       _mapStateToProps(state) {
         const country = state.country.data;
         const news = country == null ? null :
-          Stores.News.ByCountry.lookup(state.news.byCountry, country.name);
+          Stores.News.ByCountry.items(state.news.byCountry, country.name);
 
         return {
           _news: news,
