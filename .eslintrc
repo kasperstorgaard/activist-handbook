@@ -1,23 +1,19 @@
 {
-  "rules": {
-    "comma-dangle": [2,"never"],
-    "no-cond-assign": [1,"except-parens"],
-    "no-console": 1,
-    "no-constant-condition": 2,
-    "no-control-regex": 2,
-    "no-debugger": 2,
-    "no-dupe-args": 2,
-    "no-dupe-keys": 2,
-    "no-duplicate-case": 2,
-    "no-empty-character-class": 1,
-    "no-empty": 2,
-    "no-ex-assign": 2,
-    "no-extra-boolean-cast": 1,
-    "no-extra-parens": [1,"all"],
-    "no-extra-semi": 1,
-    "no-func-assign": 2,
-    "no-inner-declarations": [2,"both"],
-    "no-invalid-regexp": 2,
-    "no-irregular-whitespace": 1
+  "parserOptions": {
+    "ecmaVersion": 2017,
+    "sourceType": "module"
+  },
+  "extends": ["eslint:recommended"],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "__REDUX_DEVTOOLS_EXTENSION__": true,
+    "expect": true,
+    "test": true,
+    "global": true,
+    "afterEach": true,
+    "Promise": true
   }
 }
