@@ -60,7 +60,6 @@ test('uploading() returns true when upload is not done', async () => {
 
   store.dispatch(sut.single(mockData()[0]));
 
-  const state = store.getState();
   expect(sut.uploading(store.getState())).toBe(true);
 });
 
@@ -79,8 +78,7 @@ test('progress() returns 66 after uploading 2 of 3 files.', async () => {
   await store.dispatch(sut.single(mockData()[1]));
   store.dispatch(sut.single(mockData()[2]));
 
-  const state = store.getState();
-  expect(sut.progress(state)).toBe(66);
+  expect(sut.progress(store.getState())).toBe(66);
 });
 
 test('single() adds to uploaded when done', async () => {

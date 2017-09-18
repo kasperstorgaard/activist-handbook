@@ -54,7 +54,7 @@ const initialState = {
 
 // Reducers
 export const reducer = handleActions({
-  [RESET]: (state, {payload}) =>
+  [RESET]: (state) =>
     Object.assign({}, state, {uploading: [], uploaded: [], errors: []}),
   [START]: (state, {payload}) =>
     Object.assign({}, state, {uploading: state.uploading.concat([payload])}),

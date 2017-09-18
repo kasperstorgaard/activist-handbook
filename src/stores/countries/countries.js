@@ -79,13 +79,13 @@ function rankItems(items, rawQuery) {
 
 // Reducers
 export const reducer = handleActions({
-  [INIT]: (state, {payload}) =>
+  [INIT]: (state,) =>
     Object.assign(state, {loading: true, failed: false}),
   [LOAD]: (state, {payload}) =>
     Object.assign(state, {items: payload, loading: false}),
   [QUERY]: (state, {payload}) =>
     Object.assign(state, {filtered: rankItems(state.items, payload || '')}),
-  [FAIL]: (state, {payload}) =>
+  [FAIL]: (state) =>
     Object.assign(state, {items: null, loading: false, failed: true})
 }, initialState);
 
