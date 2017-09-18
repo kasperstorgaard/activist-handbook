@@ -1,7 +1,7 @@
 import td from 'testdouble';
 import {createStore, applyMiddleware} from 'redux';
 import thunk from 'redux-thunk';
-import * as sut from './by-country';
+import * as sut from './news';
 
 const fetch = td.function();
 global.fetch = fetch;

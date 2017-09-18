@@ -35,12 +35,12 @@
       }
 
       _update(country, limit) {
-        this._dispatch(Stores.News.ByCountry.get(country, limit));
+        this._dispatch(Stores.News.get(country, limit));
       }
 
       _mapStateToProps(state) {
         return {
-          _news: state.news.byCountry.items
+          _news: state.news.items
         };
       }
     }
