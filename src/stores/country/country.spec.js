@@ -23,7 +23,8 @@ function buildResponse(data) {
 }
 
 function mockApi(promises = [Promise.resolve(mockData())]) {
-  td.when(fetch(td.matchers.contains('//api.graph.cool'), td.matchers.anything()))
+  const matchesApi = td.matchers.contains('//api.graph.cool');
+  td.when(fetch(matchesApi, td.matchers.anything()))
     .thenReturn(...promises.map(async promise => {
       const response = buildResponse(await promise);
       return ({json: async() => response});
