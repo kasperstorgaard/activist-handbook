@@ -20,10 +20,6 @@
       static get properties() {
         return {
           country: String,
-          mode: {
-            type: String,
-            value: 'latest'
-          },
           limit: {
             type: Number,
             value: 10
@@ -34,46 +30,17 @@
 
       static get observers() {
         return [
-          '_update(mode, limit, country)'
+          '_update(country, limit)'
         ];
       }
 
-      _update(mode, limit, country) {
-        if (mode === 'by-country') {
-          return this._getByCountry(country, limit);
-        }
-
-        if (mode === 'latest') {
-          return this._getLatest(limit);
-        }
-      }
-
-      _getByCountry(country, limit) {
-        if (!country) {
-          return;
-        }
+      _update(country, limit) {
         this._dispatch(Stores.News.ByCountry.get(country, limit));
       }
 
-      _getLatest(limit) {
-        return null;
-      }
-
-      _mapStateToNews(mode, state) {
-        if (mode === 'by-country') {
-          return Stores.News.ByCountry.items(state.news.byCountry, this.country);
-        }
-        if (mode === 'latest') {
-          return null;
-        }
-        return null;
-      }
-
       _mapStateToProps(state) {
-        const country = state.country.data;
-
         return {
-          _news: this._mapStateToNews(this.mode, state)
+          _news: state.news.byCountry.items
         };
       }
     }
