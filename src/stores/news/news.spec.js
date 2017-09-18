@@ -29,12 +29,10 @@ function buildResponse(news) {
   };
 }
 
-function mockApi(options = {}) {
-  const resolvers = options.resolvers || [Promise.resolve(mockData())];
-
+function mockApi(promises = [Promise.resolve(mockData())]) {
   td.when(fetch(td.matchers.contains('//api.graph.cool'), td.matchers.anything()))
-    .thenReturn(...resolvers.map(async resolver => {
-      const response = buildResponse(await resolver);
+    .thenReturn(...promises.map(async promise => {
+      const response = buildResponse(await promise);
       return {json: async() => response};
     }))
 }
@@ -71,7 +69,7 @@ test('get() sets items after response', async () => {
 });
 
 test('get() sets loading=false when failed', async () => {
-  mockApi({resolvers: [Promise.reject()]});
+  mockApi([Promise.reject()]);
   const store = buildStore();
 
   await store.dispatch(sut.get());
@@ -80,7 +78,7 @@ test('get() sets loading=false when failed', async () => {
 });
 
 test('get() sets errors when failed', async () => {
-  mockApi({resolvers: [Promise.reject()]});
+  mockApi([Promise.reject()]);
   const store = buildStore();
 
   await store.dispatch(sut.get());
@@ -89,8 +87,7 @@ test('get() sets errors when failed', async () => {
 });
 
 test('get() resets errors', async () => {
-  const resolvers = [Promise.reject(), Promise.resolve(mockData())];
-  mockApi({resolvers});
+  mockApi([Promise.reject(), Promise.resolve(mockData())]);
   const store = buildStore();
 
   await store.dispatch(sut.get());
@@ -100,12 +97,7 @@ test('get() resets errors', async () => {
 });
 
 test('get() overwrites items', async () => {
-  const resolvers = [
-    Promise.resolve(mockData()),
-    Promise.resolve([mockData()[0]])
-  ];
-
-  mockApi({resolvers});
+  mockApi([Promise.resolve(mockData()), Promise.resolve([mockData()[0]])])
   const store = buildStore();
 
   await store.dispatch(sut.get());
