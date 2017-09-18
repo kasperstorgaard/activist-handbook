@@ -33,7 +33,8 @@ async function mockAPI(options = {}) {
   const fail = options.fail;
   const resolvers = options.resolvers || [Promise.resolve()];
 
-  const target = td.when(fetch(td.matchers.contains('//api.graph.cool'), td.matchers.anything()));
+  const target = td.when(fetch(
+    td.matchers.contains('//api.graph.cool'), td.matchers.anything()));
 
   if (!fail) {
     // This is needed for individual control of when multiple fetches resolve.
