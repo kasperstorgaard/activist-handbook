@@ -34,14 +34,13 @@ function buildResponse() {
 }
 
 async function mockApi(promises = [Promise.resolve()]) {
-  const target = td.when(fetch(
-    td.matchers.contains('//api.graph.cool'), td.matchers.anything()));
+  const apiMatch = td.matchers.contains('//api.graph.cool');
 
-  // This is needed for individual control of when multiple fetches resolve.
-  target.thenReturn(...promises.map(async data => {
-    const response = buildResponse(await data);
-    return {json: async() => response};
-  }));
+  td.when(fetch(apiMatch , td.matchers.anything()))
+    .thenReturn(...promises.map(async promise => {
+      const response = buildResponse(await promise);
+      return {json: async() => response};
+    }));
 }
 
 function setup() {
