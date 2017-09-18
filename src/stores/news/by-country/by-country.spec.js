@@ -16,82 +16,100 @@ function mockData() {
     body: 'some body text here'
   }, {
     title: 'another title',
-    body: 'some body text here'
+    body: 'some other body text here'
+  }, {
+    title: 'last title',
+    body: 'text some body here'
   }];
 }
 
-function mockAPI(options = {}) {
-  const data = {
-    allNews: options.data || mockData()
+function buildResponse(news) {
+  return {
+    data: {allNews: news}
   };
+}
 
-  const target = td.when(fetch(td.matchers.contains('//api.graph.cool'), td.matchers.anything()));
+function mockApi(options = {}) {
+  const resolvers = options.resolvers || [Promise.resolve(mockData())];
 
-  if (!options.fail) {
-    target.thenResolve({json: async() => ({data})});
-  } else {
-    target.thenReject();
-  }
+  td.when(fetch(td.matchers.contains('//api.graph.cool'), td.matchers.anything()))
+    .thenReturn(...resolvers.map(async resolver => {
+      const response = buildResponse(await resolver);
+      return {json: async() => response};
+    }))
 }
 
 function setup() {
-  mockAPI();
+  mockApi();
   return buildStore();
 }
 
 afterEach(() => td.reset());
 
-test('loading(state, name) sets loading true', async () => {
+test('get() sets loading=true', () => {
   const store = setup();
 
-  store.dispatch(sut.get('denmark'));
+  store.dispatch(sut.get());
 
-  const loading = sut.loading(store.getState(), 'denmark');
-  expect(loading).toBe(true);
+  expect(store.getState().loading).toBe(true);
 });
 
-test('loading(state, name) sets loading false when loaded', async () => {
+test('get() sets loading=false after response', async() => {
   const store = setup();
 
-  await store.dispatch(sut.get('denmark'));
+  await store.dispatch(sut.get());
 
-  const loading = sut.loading(store.getState(), 'denmark');
-  expect(loading).toBe(false);
+  expect(store.getState().loading).toBe(false);
 });
 
-test('failed(state, name) returns false when not failed', async () => {
+test('get() sets items after response', async () => {
   const store = setup();
 
-  await store.dispatch(sut.get('denmark'));
+  await store.dispatch(sut.get());
 
-  const failed = sut.failed(store.getState(), 'denmark');
-  expect(failed).toBe(false);
+  expect(store.getState().items.length).toBe(3);
 });
 
-test('failed(state, name) returns true when failed', async () => {
-  mockAPI({fail: true});
+test('get() sets loading=false when failed', async () => {
+  mockApi({resolvers: [Promise.reject()]});
   const store = buildStore();
 
-  await store.dispatch(sut.get('denmark'));
+  await store.dispatch(sut.get());
 
-  const failed = sut.failed(store.getState(), 'denmark');
-  expect(failed).toBe(true);
+  expect(store.getState().loading).toBe(false);
 });
 
-test('items(state, name) gets the news by country when defined', async () => {
-  const store = setup();
+test('get() sets errors when failed', async () => {
+  mockApi({resolvers: [Promise.reject()]});
+  const store = buildStore();
 
-  await store.dispatch(sut.get('denmark'));
+  await store.dispatch(sut.get());
 
-  const news = sut.items(store.getState(), 'denmark');
-  expect(news.length).toBe(2);
+  expect(store.getState().errors.length).toBe(1);
 });
 
-test('items(state, name) gets null when not defined', async () => {
-  const store = setup();
+test('get() resets errors', async () => {
+  const resolvers = [Promise.reject(), Promise.resolve(mockData())];
+  mockApi({resolvers});
+  const store = buildStore();
 
-  await store.dispatch(sut.get('denmark'));
+  await store.dispatch(sut.get());
+  store.dispatch(sut.get());
 
-  const news = sut.items(store.getState(), 'nowhere');
-  expect(news).toBe(null);
+  expect(store.getState().errors.length).toBe(0);
+});
+
+test('get() overwrites items', async () => {
+  const resolvers = [
+    Promise.resolve(mockData()),
+    Promise.resolve([mockData()[0]])
+  ];
+
+  mockApi({resolvers});
+  const store = buildStore();
+
+  await store.dispatch(sut.get());
+  await store.dispatch(sut.get());
+
+  expect(store.getState().items.length).toBe(1);
 });
