@@ -69,20 +69,14 @@ export const reducer = handleActions({
 
 export default reducer;
 
-export function loading(state, name) {
-  const key = (name || '').toLowerCase();
-  const item = state.lookup[key];
-  return item != null ? item.loading : null;
+function lookupProp(prop) {
+  return function (state, name) {
+    const key = (name || '').toLowerCase();
+    const item = state.lookup[key];
+    return item != null ? item[prop] : null;
+  }
 }
 
-export function failed(state, name) {
-  const key = (name || '').toLowerCase();
-  const item = state.lookup[key];
-  return item != null ? item.failed : null;
-}
-
-export function items(state, name) {
-  const key = (name || '').toLowerCase();
-  const item = state.lookup[key];
-  return item != null ? item.items : null;
-}
+export const loading = lookupProp('loading');
+export const failed = lookupProp('failed');
+export const items = lookupProp('items');
