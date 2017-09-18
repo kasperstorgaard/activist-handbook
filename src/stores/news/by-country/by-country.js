@@ -12,6 +12,8 @@ const load = createAction(LOAD);
 const fail = createAction(FAIL);
 
 async function getData(name, limit = 10) {
+  const query = name ? {country: {name}, limit} : {limit};
+
   const data = await queryGraphQL(
    `query NewsByCountry($country: CountryFilter, $limit: Int) {
       allNews(last: $limit filter: {
@@ -21,7 +23,7 @@ async function getData(name, limit = 10) {
         title
       }
     }`,
-    {country: {name}, limit}
+    query
   );
 
   return data.allNews;
@@ -29,12 +31,12 @@ async function getData(name, limit = 10) {
 
 export function get(country, limit = 10) {
   return async dispatch => {
-    dispatch(init({ref: country}));
+    dispatch(init());
     try {
-      const news = await getData(country, limit);
-      dispatch(load({ref: country, items: news}));
-    } catch(e) {
-      dispatch(fail({ref: country, msg: e}))
+      const data = await getData(country);
+      dispatch(load(data));
+    } catch(error) {
+      dispatch(fail([error]));
     }
   };
 }
@@ -46,37 +48,9 @@ const initialState = {
 
 // Reducers
 export const reducer = handleActions({
-  [INIT]: (state, {payload}) => {
-    const key = payload.ref.toLowerCase();
-    const lookup = Object.assign({}, state.lookup, {
-      [key]: {loading: true, items: null, failed: false}
-    });
-    return Object.assign(state, {lookup});
-  },
-  [LOAD]: (state, {payload}) => {
-    const key = payload.ref.toLowerCase();
-    const item = Object.assign({}, state.lookup[key], {items: payload.items, loading: false});
-    const lookup = Object.assign({}, state.lookup, {[key]: item});
-    return Object.assign(state, {lookup});
-  },
-  [FAIL]: (state, {payload}) => {
-    const key = payload.ref.toLowerCase();
-    const item = Object.assign({}, state.lookup[key], {failed: true, loading: false, msg: payload.msg});
-    const lookup = Object.assign({}, state.lookup, {[key]: item});
-    return Object.assign(state, {lookup});
-  }
+  [INIT]: (state) => Object.assign({loading: true, items: null, errors: []}),
+  [LOAD]: (state, {payload}) => ({loading: false, items: payload}),
+  [FAIL]: (state, {payload}) => ({loading: false, errors: payload})
 }, initialState);
 
 export default reducer;
-
-function lookupProp(prop) {
-  return function (state, name) {
-    const key = (name || '').toLowerCase();
-    const item = state.lookup[key];
-    return item != null ? item[prop] : null;
-  }
-}
-
-export const loading = lookupProp('loading');
-export const failed = lookupProp('failed');
-export const items = lookupProp('items');
