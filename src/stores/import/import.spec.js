@@ -29,23 +29,22 @@ function mockData() {
   }];
 }
 
+function buildResponse() {
+  return { data: {} };
+}
+
 async function mockAPI(options = {}) {
   const fail = options.fail;
-  const resolvers = options.resolvers || [Promise.resolve()];
+  const responses = options.responses || [Promise.resolve()];
 
   const target = td.when(fetch(
     td.matchers.contains('//api.graph.cool'), td.matchers.anything()));
 
-  if (!fail) {
-    // This is needed for individual control of when multiple fetches resolve.
-    const returns = resolvers.map(async resolver => {
-      await resolver;
-      return { json: async() => ({data: null})};
-    });
-    target.thenReturn(...returns);
-  } else {
-    target.thenReject();
-  }
+  // This is needed for individual control of when multiple fetches resolve.
+  target.thenReturn(...responses.map(async resolver => {
+    const response = buildResponse(await resolver);
+    return {json: async() => response};
+  }));
 }
 
 function setup() {
@@ -56,7 +55,7 @@ function setup() {
 afterEach(() => td.reset());
 
 test('uploading() returns true when upload is not done', async () => {
-  mockAPI({fail: true});
+  mockAPI({responses: [Promise.reject()]});
   const store = buildStore();
 
   store.dispatch(sut.single(mockData()[0]));
@@ -91,7 +90,7 @@ test('single() adds to uploaded when done', async () => {
 });
 
 test('single() adds to errors when upload fails', async() => {
-  mockAPI({fail: true});
+  mockAPI({responses: [Promise.reject()]});
   const store = buildStore();
 
   await store.dispatch(sut.single(mockData()[0]));
@@ -100,7 +99,7 @@ test('single() adds to errors when upload fails', async() => {
 });
 
 test('reset() resets existing errors', async() => {
-  mockAPI({fail: true});
+  mockAPI({responses: [Promise.reject()]});
   const store = buildStore();
 
   await store.dispatch(sut.single(mockData()[0]));
