@@ -25,13 +25,12 @@ function buildResponse(data) {
 }
 
 function mockApi(promises = [Promise.resolve(mockData())]) {
-
-  td.when(fetch(
-    td.matchers.contains('//api.graph.cool'), td.matchers.anything()))
-      .thenReturn(...promises.map(async data => {
-        const response = await buildResponse(await data);
-        return {json: async() => response};
-      }));
+  const matchApi = td.matchers.contains('//api.graph.cool');
+  td.when(fetch(matchApi, td.matchers.anything()))
+    .thenReturn(...promises.map(async promise => {
+      const response = await buildResponse(await promise);
+      return {json: async() => response};
+    }));
 }
 
 function setup() {
