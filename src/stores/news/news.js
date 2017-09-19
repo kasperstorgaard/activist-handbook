@@ -43,12 +43,14 @@ export function get(country, limit = 10) {
 
 // State
 const initialState = {
-  lookup: {}
+  loading: false,
+  items: null,
+  errors: null
 };
 
 // Reducers
 export const reducer = handleActions({
-  [INIT]: state => Object.assign(state, {loading: true, items: null, errors: []}),
+  [INIT]: state => Object.assign(state, {loading: true, items: null, errors: null}),
   [LOAD]: (state, {payload}) => Object.assign(state, {loading: false, items: payload}),
   [FAIL]: (state, {payload}) => Object.assign(state, {loading: false, errors: payload})
 }, initialState);
