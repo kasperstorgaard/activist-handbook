@@ -33,7 +33,7 @@ export function get(country, limit = 10) {
   return async dispatch => {
     dispatch(init());
     try {
-      const data = await getData(country);
+      const data = await getData(country, limit);
       dispatch(load(data));
     } catch(error) {
       dispatch(fail([error]));
