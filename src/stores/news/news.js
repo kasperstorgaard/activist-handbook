@@ -4,11 +4,13 @@ import {query as queryGraphQL} from '../graphql-service';
 // Types
 const INIT = 'news/INIT';
 const LOAD = 'news/LOAD';
+const SELECT = 'news/SELECT';
 const FAIL = 'news/FAIL';
 
 // Actions
 const init = createAction(INIT);
 const load = createAction(LOAD);
+export const select = createAction(SELECT);
 const fail = createAction(FAIL);
 
 async function getData(name, limit = 10) {
@@ -45,6 +47,7 @@ export function get(country, limit = 10) {
 const initialState = {
   loading: false,
   items: null,
+  selected: null,
   errors: null
 };
 
@@ -52,6 +55,11 @@ const initialState = {
 export const reducer = handleActions({
   [INIT]: state => Object.assign(state, {loading: true, items: null, errors: null}),
   [LOAD]: (state, {payload}) => Object.assign(state, {loading: false, items: payload}),
+  [SELECT]: (state, {payload}) => {
+    const item = state.items == null || !payload ? null :
+      state.items.find(item => item.id === payload);
+    return Object.assign(state, {selected: item || null});
+  },
   [FAIL]: (state, {payload}) => Object.assign(state, {loading: false, errors: payload})
 }, initialState);
 
