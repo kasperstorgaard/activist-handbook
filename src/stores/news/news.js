@@ -2,9 +2,9 @@ import {createAction, handleActions} from 'redux-actions';
 import {query as queryGraphQL} from '../graphql-service';
 
 // Types
-const INIT = 'news/by-country/INIT';
-const LOAD = 'news/by-country/LOAD';
-const FAIL = 'news/by-country/FAIL';
+const INIT = 'news/INIT';
+const LOAD = 'news/LOAD';
+const FAIL = 'news/FAIL';
 
 // Actions
 const init = createAction(INIT);
