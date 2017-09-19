@@ -9,7 +9,7 @@
         display: block;
       }
     </style>
-    <ah-news-list items="[[_news]]"></ah-news-list>
+    <ah-news-list items="[[_items]]"></ah-news-list>
   </template>
 
   <script>
@@ -40,7 +40,7 @@
 
       _mapStateToProps(state) {
         return {
-          _news: state.news.items
+          _items: state.news.items
         };
       }
     }
