@@ -12,12 +12,15 @@ function buildStore() {
 
 function mockData() {
   return [{
+    id: 'id0',
     title: 'just a little title',
     body: 'some body text here'
   }, {
+    id: 'id1',
     title: 'another title',
     body: 'some other body text here'
   }, {
+    id: 'id2',
     title: 'last title',
     body: 'text some body here'
   }];
@@ -106,4 +109,47 @@ test('get() overwrites items', async () => {
   await store.dispatch(sut.get());
 
   expect(store.getState().items.length).toBe(1);
+});
+
+test('select() selects nothing if no args', () => {
+  const store = setup();
+
+  store.dispatch(sut.select());
+
+  expect(store.getState().selected).toBe(null);
+});
+
+test('select(name) selects item by name', async () => {
+  const store = setup()
+
+  await store.dispatch(sut.get());
+  store.dispatch(sut.select('id1'));
+
+  expect(store.getState().selected.id).toBe('id1');
+});
+
+test('select(name) selects item by name', async () => {
+  const store = setup()
+
+  store.dispatch(sut.select('id1'));
+
+  expect(store.getState().selected).toBe(null);
+});
+
+test('select(name) selects nothing if no matching item', () => {
+  const store = setup()
+
+  store.dispatch(sut.select('not_a_match'));
+
+  expect(store.getState().selected).toBe(null);
+});
+
+test('select(name) overwrites previous selection', async () => {
+  const store = setup()
+
+  await store.dispatch(sut.get());
+  store.dispatch(sut.select('id1'));
+  store.dispatch(sut.select('id2'));
+
+  expect(store.getState().selected.id).toBe('id2');
 });
