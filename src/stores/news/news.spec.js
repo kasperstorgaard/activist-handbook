@@ -98,7 +98,7 @@ test('get() resets errors', async () => {
   await store.dispatch(sut.get());
   store.dispatch(sut.get());
 
-  expect(store.getState().errors.length).toBe(0);
+  expect(store.getState().errors).toBe(null);
 });
 
 test('get() overwrites items', async () => {
@@ -120,7 +120,7 @@ test('select() selects nothing if no args', () => {
 });
 
 test('select(name) selects item by name', async () => {
-  const store = setup()
+  const store = setup();
 
   await store.dispatch(sut.get());
   store.dispatch(sut.select('id1'));
@@ -129,15 +129,15 @@ test('select(name) selects item by name', async () => {
 });
 
 test('select(name) selects item by name', async () => {
-  const store = setup()
+  const store = setup();
 
   store.dispatch(sut.select('id1'));
 
-  expect(store.getState().selected).toBe(null);
+  expect(store.getState().selected.id).toBe('id1');
 });
 
 test('select(name) selects nothing if no matching item', () => {
-  const store = setup()
+  const store = setup();
 
   store.dispatch(sut.select('not_a_match'));
 
@@ -145,7 +145,7 @@ test('select(name) selects nothing if no matching item', () => {
 });
 
 test('select(name) overwrites previous selection', async () => {
-  const store = setup()
+  const store = setup();
 
   await store.dispatch(sut.get());
   store.dispatch(sut.select('id1'));
