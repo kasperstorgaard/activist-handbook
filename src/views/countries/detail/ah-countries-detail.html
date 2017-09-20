@@ -1,6 +1,7 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../../../bower_components/google-map/google-map.html">
+<link rel="import" href="../../../../bower_components/google-map/google-map-marker.html">
 <link rel="import" href="../../../stores/stores.html">
 <link rel="import" href="../../../shared/components/ah-news.html">
 
@@ -33,7 +34,13 @@
         latitude="[[_country.position.0]]"
         longitude="[[_country.position.1]]"
         zoom="3"
-        fit-to-markers></google-map>
+        fit-to-markers>
+        <template is="dom-repeat" items="[[_positions]]" as="position">
+          <google-map-marker slot="markers"
+            latitude="[[position.0]]"
+            longitude="[[position.1]]"></google-map-marker>
+        </template>
+      </google-map>
     </div>
   </template>
 
@@ -78,11 +85,16 @@
       }
 
       _mapStateToProps(state) {
-        const country = state.country.data;
+        const positions = (state.news.items || [])
+          .filter(item => item.position && item.position.length)
+          .map(item => [parseFloat(item.position[0]), parseFloat(item.position[1])]);
+        
+        console.log(positions);
 
         return {
           _loading: state.country.loading,
-          _country: country
+          _country: state.country.data,
+          _positions: positions
         };
       }
 
