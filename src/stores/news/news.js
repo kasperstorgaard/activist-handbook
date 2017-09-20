@@ -23,6 +23,7 @@ async function getData(name, limit = 10) {
       }) {
         id
         title
+        position
       }
     }`,
     query
