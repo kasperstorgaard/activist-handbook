@@ -89,8 +89,6 @@
           .filter(item => item.position && item.position.length)
           .map(item => [parseFloat(item.position[0]), parseFloat(item.position[1])]);
         
-        console.log(positions);
-
         return {
           _loading: state.country.loading,
           _country: state.country.data,
