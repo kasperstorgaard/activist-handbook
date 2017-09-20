@@ -9,7 +9,10 @@
         display: block;
       }
     </style>
-    <ah-news-list items="[[_items]]"></ah-news-list>
+    <ah-news-list
+      items="[[_items]]"
+      selected="[[_selectedItem]]"
+      on-selected-changed="_select"></ah-news-list>
   </template>
 
   <script>
@@ -24,7 +27,8 @@
             type: Number,
             value: 10
           },
-          _items: Array
+          _items: Array,
+          _selectedItem: Object
         }
       }
 
@@ -34,13 +38,19 @@
         ];
       }
 
+      _select(event) {
+        const id = event.detail != null ? event.detail.id : null;
+        this._dispatch(Stores.News.select(id));
+      }
+
       _update(country, limit) {
         this._dispatch(Stores.News.get(country, limit));
       }
 
       _mapStateToProps(state) {
         return {
-          _items: state.news.items
+          _items: state.news.items,
+          _selectedItem: state.news.selected
         };
       }
     }
