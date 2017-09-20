@@ -52,7 +52,7 @@
 
       static get observers() {
         return [
-          '_updatedSelected(items.*)'
+          '_updateSelected(items.*)'
         ]
       }
 
@@ -71,7 +71,7 @@
         }));
       }
 
-      _updateselected({base}) {
+      _updateSelected({base}) {
         if ((!base || base.length) && this.selected) {
           this.selected = null;
         }
