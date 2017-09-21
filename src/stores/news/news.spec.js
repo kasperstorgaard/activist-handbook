@@ -101,6 +101,27 @@ test('get() resets errors', async () => {
   expect(store.getState().errors).toBe(null);
 });
 
+test('get() resets items', async () => {
+  mockApi([Promise.reject(), Promise.resolve(mockData())]);
+  const store = buildStore();
+
+  await store.dispatch(sut.get());
+  store.dispatch(sut.get());
+
+  expect(store.getState().items).toBe(null);
+});
+
+test('get() resets selected', async () => {
+  mockApi([Promise.reject(), Promise.resolve(mockData())]);
+  const store = buildStore();
+
+  await store.dispatch(sut.get());
+  store.dispatch(sut.get('id1'));
+  store.dispatch(sut.get());
+
+  expect(store.getState().selected).toBe(null);
+});
+
 test('get() overwrites items', async () => {
   mockApi([Promise.resolve(mockData()), Promise.resolve([mockData()[0]])])
   const store = buildStore();
@@ -109,6 +130,33 @@ test('get() overwrites items', async () => {
   await store.dispatch(sut.get());
 
   expect(store.getState().items.length).toBe(1);
+});
+
+test('get() should set selected=null if no returned items', async () => {
+  mockApi([Promise.resolve([])]);
+  const store = buildStore();
+
+  await store.dispatch(sut.get());
+
+  expect(store.getState().selected).toBe(null);
+});
+
+test('get() should select first item', async () => {
+  const store = setup();
+
+  await store.dispatch(sut.get());
+
+  expect(store.getState().selected.id).toBe('id0');
+});
+
+test('get() should overwrite selected', async () => {
+  const store = setup();
+
+  await store.dispatch(sut.get());
+  store.dispatch(sut.select('id1'));
+  await store.dispatch(sut.get());
+
+  expect(store.getState().selected.id).toBe('id0');
 });
 
 test('select() selects nothing if no args', () => {
