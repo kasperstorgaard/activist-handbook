@@ -35,10 +35,14 @@
         longitude="[[_country.position.1]]"
         zoom="3"
         fit-to-markers>
-        <template is="dom-repeat" items="[[_positions]]" as="position">
+        <template is="dom-repeat" items="[[_news]]">
           <google-map-marker slot="markers"
-            latitude="[[position.0]]"
-            longitude="[[position.1]]"></google-map-marker>
+            news-id$="[[item.id]]"
+            icon="[[_getIcon(item.id, _selected.id)]]"
+            latitude="[[_parse(item.position.0)]]"
+            longitude="[[_parse(item.position.1)]]"
+            click-events="true"
+            on-google-map-marker-click="_selectMarker"></google-map-marker>
         </template>
       </google-map>
     </div>
@@ -61,7 +65,9 @@
             value: () => ({ name: null })
           },
           _map: Object,
-          _feature: Object
+          _feature: Object,
+          _news: Array,
+          _selected: Object
         }
       }
 
@@ -85,14 +91,11 @@
       }
 
       _mapStateToProps(state) {
-        const positions = (state.news.items || [])
-          .filter(item => item.position && item.position.length)
-          .map(item => [parseFloat(item.position[0]), parseFloat(item.position[1])]);
-        
         return {
           _loading: state.country.loading,
           _country: state.country.data,
-          _positions: positions
+          _news: state.news.items,
+          _selected: state.news.selected
         };
       }
 
@@ -121,6 +124,21 @@
           feature.getGeometry().forEachLatLng(latlng => bounds.extend(latlng)));
 
         map.fitBounds(bounds);
+      }
+
+      _parse(value) {
+        return value ? parseFloat(value) : value;
+      }
+
+      _getIcon(id, selectedId) {
+        return id && id === selectedId ?
+          '/static/megaphone-selected.svg' :
+          '/static/megaphone.svg';
+      }
+
+      _selectMarker(event) {
+        const id = event.target.getAttribute('news-id');
+        this._dispatch(Stores.News.select(id));
       }
     }
 
