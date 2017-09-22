@@ -14,15 +14,18 @@ function mockData() {
   return [{
     id: 'id0',
     title: 'just a little title',
-    body: 'some body text here'
+    body: 'some body text here',
+    position: [1, 9]
   }, {
     id: 'id1',
     title: 'another title',
-    body: 'some other body text here'
+    body: 'some other body text here',
+    position: [1, 9]
   }, {
     id: 'id2',
     title: 'last title',
-    body: 'text some body here'
+    body: 'text some body here',
+    position: [1, 9]
   }];
 }
 
