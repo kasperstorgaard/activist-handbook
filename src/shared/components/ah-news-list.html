@@ -15,8 +15,8 @@
       }
 
       li {
-        line-height: 2em;
-        padding: 0 12px;
+        line-height: 1.4em;
+        padding: 12px;
         border-bottom: 1px solid #dedede;
       }
 
@@ -27,12 +27,29 @@
       [selected] {
         background: #dedede;
       }
+
+      .title
+      {
+        font-weight: bold;
+      }
+
+      .body {
+        display: none;
+        margin: 0;
+      }
+
+      [selected] .body {
+        display: block;
+      }
     </style>
     <ul>
       <template is="dom-repeat" items="[[items]]">
         <li news-id$="[[item.id]]"
           selected$="[[_isSelected(selected, item.id)]]"
-          on-click="_select">[[item.title]]</li>
+          on-click="_select">
+          <div class="title">[[item.title]]</div>
+          <p class="body">[[item.body]]</p>
+        </li>
       </template>
     </ul>
   </template>
@@ -61,7 +78,7 @@
       }
 
       _select(event) {
-        const id = event.target.getAttribute('news-id');
+        const id = event.currentTarget.getAttribute('news-id');
 
         const item = this.items.find(item => item.id === id) || null;
 
