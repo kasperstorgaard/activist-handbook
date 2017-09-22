@@ -60,7 +60,7 @@ const initialState = {
 // Reducers
 export const reducer = handleActions({
   [INIT]: (state) =>
-    Object.assign({}, state, {loading: true, failed: false}),
+    Object.assign({}, state, {loading: true, failed: false, data: null}),
   [LOAD]: (state, {payload}) =>
     Object.assign({}, state, {data: payload, loading: false}),
   [FAIL]: (state) =>
