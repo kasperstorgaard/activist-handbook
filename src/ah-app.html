@@ -92,7 +92,7 @@
       <app-toolbar>
         <paper-icon-button icon="menu" on-click="_toggleDrawer"></paper-icon-button>
         <div main-title>Activist Handbook</div>
-        <paper-icon-button icon="search"></paper-icon-button>
+        <paper-icon-button icon="add"></paper-icon-button>
       </app-toolbar>
     </app-header>
 
@@ -120,6 +120,7 @@
         <ah-countries id="countries" route="{{_subroute}}"></ah-countries>
         <ah-general id="general"></ah-general>
         <ah-import id="import"></ah-import>
+        <ah-create id="create"></ah-create>
         <ah-404 id="404"></ah-404>
       </iron-pages>
     </div>
@@ -154,6 +155,10 @@
                 }, {
                   id: 'import',
                   name: 'Import',
+                  menu: false
+                }, {
+                  id: 'create',
+                  name: 'Create',
                   menu: false
                 }]
             },
