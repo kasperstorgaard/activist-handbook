@@ -1,0 +1,38 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="ah-create">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Create news article</h2>
+    <iron-form>
+      <form method="get" action="/form/handler" id="form">
+        <paper-input type="text" name="title" placeholder="Enter title here..."></paper-input>
+        <paper-input type="text" name="body" placeholder="Enter body here..."></paper-input>
+        <paper-input type="text" name="latitude" placeholder="Enter latitude here..."></paper-input>
+        <paper-input type="text" name="longitude" placeholder="Enter longitude here..."></paper-input>
+        <paper-button raised on-click="_submit">create</paper-button>
+      </form>
+    </iron-form>
+  </template>
+
+  <script>
+    (() => {
+      class AhCreate extends Polymer.Element {
+        static get is() { return 'ah-create'; }
+
+        _submit() {
+          this.$.form.submit();
+        }
+      }
+
+      window.customElements.define(AhCreate.is, AhCreate);
+    })();
+  </script>
+</dom-module>
