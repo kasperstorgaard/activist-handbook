@@ -29,38 +29,33 @@ function mockData() {
   }];
 }
 
-async function mockAPI(options = {}) {
-  const fail = options.fail;
-  const resolvers = options.resolvers || [Promise.resolve()];
+function buildResponse() {
+  return { data: {} };
+}
 
-  const target = td.when(fetch(td.matchers.contains('//api.graph.cool'), td.matchers.anything()));
+async function mockApi(promises = [Promise.resolve()]) {
+  const apiMatch = td.matchers.contains('//api.graph.cool');
 
-  if (!fail) {
-    // This is needed for individual control of when multiple fetches resolve.
-    const returns = resolvers.map(async resolver => {
-      await resolver;
-      return { json: async() => ({data: null})};
-    });
-    target.thenReturn(...returns);
-  } else {
-    target.thenReject();
-  }
+  td.when(fetch(apiMatch , td.matchers.anything()))
+    .thenReturn(...promises.map(async promise => {
+      const response = buildResponse(await promise);
+      return {json: async() => response};
+    }));
 }
 
 function setup() {
-  mockAPI();
+  mockApi();
   return buildStore();
 }
 
 afterEach(() => td.reset());
 
 test('uploading() returns true when upload is not done', async () => {
-  mockAPI({fail: true});
+  mockApi([Promise.reject()]);
   const store = buildStore();
 
   store.dispatch(sut.single(mockData()[0]));
 
-  const state = store.getState();
   expect(sut.uploading(store.getState())).toBe(true);
 });
 
@@ -79,8 +74,7 @@ test('progress() returns 66 after uploading 2 of 3 files.', async () => {
   await store.dispatch(sut.single(mockData()[1]));
   store.dispatch(sut.single(mockData()[2]));
 
-  const state = store.getState();
-  expect(sut.progress(state)).toBe(66);
+  expect(sut.progress(store.getState())).toBe(66);
 });
 
 test('single() adds to uploaded when done', async () => {
@@ -92,7 +86,7 @@ test('single() adds to uploaded when done', async () => {
 });
 
 test('single() adds to errors when upload fails', async() => {
-  mockAPI({fail: true});
+  mockApi([Promise.reject()]);
   const store = buildStore();
 
   await store.dispatch(sut.single(mockData()[0]));
@@ -101,7 +95,7 @@ test('single() adds to errors when upload fails', async() => {
 });
 
 test('reset() resets existing errors', async() => {
-  mockAPI({fail: true});
+  mockApi([Promise.reject()]);
   const store = buildStore();
 
   await store.dispatch(sut.single(mockData()[0]));

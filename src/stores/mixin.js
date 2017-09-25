@@ -36,7 +36,7 @@ export function Mixin(T) {
       super.disconnectedCallback();
 
       if (this.__handleStoreChange) {
-        Stores.Root.unsubscribe(this.__handleStoreChange);
+        window.Stores.Root.unsubscribe(this.__handleStoreChange);
       }
     }
   };

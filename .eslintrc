@@ -1,0 +1,19 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 2017,
+    "sourceType": "module"
+  },
+  "extends": ["eslint:recommended"],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "__REDUX_DEVTOOLS_EXTENSION__": true,
+    "expect": true,
+    "test": true,
+    "global": true,
+    "afterEach": true,
+    "Promise": true
+  }
+}

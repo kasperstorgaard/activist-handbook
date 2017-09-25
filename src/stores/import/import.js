@@ -13,9 +13,9 @@ const done = createAction(DONE);
 const error = createAction(ERROR);
 
 async function createCountry(country) {
-  const regions = country.regions != null ? `["${country.regions.join('", "')}"]` : null;
-  const code = country.code != null ? `["${country.code.join('", "')}"]` : null;
-  const position = country.position != null ? `[${country.position.join(', ')}]` : null;
+  const regions = country.regions != null ? JSON.stringify(country.regions) : null;
+  const code = country.code != null ? JSON.stringify(country.code) : null;
+  const position = country.position != null ? JSON.stringify(country.position) : null;
 
   await queryGraphQL(
   `mutation {
@@ -54,7 +54,7 @@ const initialState = {
 
 // Reducers
 export const reducer = handleActions({
-  [RESET]: (state, {payload}) =>
+  [RESET]: (state) =>
     Object.assign({}, state, {uploading: [], uploaded: [], errors: []}),
   [START]: (state, {payload}) =>
     Object.assign({}, state, {uploading: state.uploading.concat([payload])}),

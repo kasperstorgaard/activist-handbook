@@ -10,23 +10,31 @@ function buildStore() {
   return createStore(sut.reducer, applyMiddleware(thunk));
 }
 
-function mockApi(options = {}) {
-  const data = {
-    Country: {
-      id: 1,
-      name: 'denmark',
-      code: ['DK', 'DNK'],
-      region: 'Europe'
-    }
-  };
+function mockData() {
+  return [{
+    id: 0,
+    name: 'denmark',
+    code: ['DK', 'DNK'],
+    region: 'Europe'
+  }, {
+    id: 1,
+    name: 'sweden',
+    code: ['SE', 'SWE'],
+    region: 'Europe'
+  }];
+}
 
-  const target = td.when(fetch(td.matchers.contains('//api.graph.cool'), td.matchers.anything()));
+function buildResponse(data) {
+  return {data: {Country: data}};
+}
 
-  if (!options.fail) {
-    target.thenResolve({json: async() => ({data})});
-  } else {
-    target.thenReject();
-  }
+function mockApi(promises = [Promise.resolve(mockData()[0])]) {
+  const matchesApi = td.matchers.contains('//api.graph.cool');
+  td.when(fetch(matchesApi, td.matchers.anything()))
+    .thenReturn(...promises.map(async promise => {
+      const response = buildResponse(await promise);
+      return ({json: async() => response});
+    }));
 
   const geoJson = {type: 'FeatureCollection', features: []};
 
@@ -54,13 +62,7 @@ test('get() sets data after response from endpoint', async () => {
 
   await store.dispatch(sut.get());
 
-  expect(store.getState().data).toEqual({
-    id: 1,
-    name: 'denmark',
-    code: ['DK', 'DNK'],
-    region: 'Europe',
-    geo: expect.any(Object)
-  });
+  expect(store.getState().data.name).toBe('denmark');
 });
 
 test('get() sets loading=false after response', async () => {
@@ -74,7 +76,7 @@ test('get() sets loading=false after response', async () => {
 test('get() sets data=null when endpoint fails', async () => {
   // we need a custom setup for this test.
   const store = buildStore();
-  mockApi({fail: true})
+  mockApi([Promise.reject]);
 
   await store.dispatch(sut.get());
 
@@ -84,7 +86,7 @@ test('get() sets data=null when endpoint fails', async () => {
 test('get() sets failed=true when endpoint fails', async () => {
   // we need a custom setup for this test.
   const store = buildStore();
-  mockApi({fail: true});
+  mockApi([Promise.reject]);
 
   await store.dispatch(sut.get());
 
@@ -94,11 +96,32 @@ test('get() sets failed=true when endpoint fails', async () => {
 test('get() sets failed=false when second request starts', async () => {
   // we need a custom setup for this test.
   const store = buildStore();
-  mockApi({fail: true});
+  mockApi([Promise.reject]);
 
   await store.dispatch(sut.get());
-
   store.dispatch(sut.get());
 
   expect(store.getState().failed).toBe(false);
+});
+
+test('get() resets data on second request', async () => {
+  // we need a custom setup for this test.
+  const store = buildStore();
+  mockApi([Promise.resolve(mockData()[0]), Promise.resolve(mockData()[1])]);
+
+  await store.dispatch(sut.get());
+  store.dispatch(sut.get());
+
+  expect(store.getState().data).toBe(null);
+});
+
+test('get() overwrites data after second request', async () => {
+  // we need a custom setup for this test.
+  const store = buildStore();
+  mockApi([Promise.resolve(mockData()[0]), Promise.resolve(mockData()[1])]);
+
+  await store.dispatch(sut.get());
+  await store.dispatch(sut.get());
+
+  expect(store.getState().data.name).toBe('sweden');
 });

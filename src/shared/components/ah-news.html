@@ -1,0 +1,60 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../stores/stores.html">
+<link rel="import" href="./ah-news-list.html">
+
+<dom-module id="ah-news">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <ah-news-list
+      items="[[_items]]"
+      selected="[[_selectedItem]]"
+      on-selected-changed="_select"></ah-news-list>
+  </template>
+
+  <script>
+    class AhNews extends Stores.Mixin(Polymer.Element) {
+
+      static get is() { return 'ah-news'; }
+
+      static get properties() {
+        return {
+          country: String,
+          limit: {
+            type: Number,
+            value: 10
+          },
+          _items: Array,
+          _selectedItem: Object
+        }
+      }
+
+      static get observers() {
+        return [
+          '_update(country, limit)'
+        ];
+      }
+
+      _select(event) {
+        const id = event.detail != null ? event.detail.id : null;
+        this._dispatch(Stores.News.select(id));
+      }
+
+      _update(country, limit) {
+        this._dispatch(Stores.News.get(country, limit));
+      }
+
+      _mapStateToProps(state) {
+        return {
+          _items: state.news.items,
+          _selectedItem: state.news.selected
+        };
+      }
+    }
+
+    window.customElements.define(AhNews.is, AhNews);
+  </script>
+</dom-module

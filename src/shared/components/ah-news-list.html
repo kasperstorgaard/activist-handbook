@@ -1,0 +1,100 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="ah-news-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+        background: white;
+      }
+
+      ul {
+        padding: 0;
+        margin: 0;
+        list-style-type: none;
+      }
+
+      li {
+        line-height: 1.4em;
+        padding: 12px;
+        border-bottom: 1px solid #dedede;
+      }
+
+      li:hover, li:active {
+        cursor: pointer;
+      }
+
+      [selected] {
+        background: #dedede;
+      }
+
+      .title
+      {
+        font-weight: bold;
+      }
+
+      .body {
+        display: none;
+        margin: 0;
+      }
+
+      [selected] .body {
+        display: block;
+      }
+    </style>
+    <ul>
+      <template is="dom-repeat" items="[[items]]">
+        <li news-id$="[[item.id]]"
+          selected$="[[_isSelected(selected, item.id)]]"
+          on-click="_select">
+          <div class="title">[[item.title]]</div>
+          <p class="body">[[item.body]]</p>
+        </li>
+      </template>
+    </ul>
+  </template>
+
+  <script>
+    class AhNewsList extends Polymer.Element {
+
+      static get is() { return 'ah-news-list'; }
+
+      static get properties() {
+        return {
+          items: Array,
+          selected: Object,
+          _selectedId: String
+        }
+      }
+
+      static get observers() {
+        return [
+          '_updateSelected(items.*)'
+        ]
+      }
+
+      _isSelected(selected, id) {
+        return selected && selected.id === id;
+      }
+
+      _select(event) {
+        const id = event.currentTarget.getAttribute('news-id');
+
+        const item = this.items.find(item => item.id === id) || null;
+
+        this.dispatchEvent(new CustomEvent('selected-changed', {
+          detail: item,
+          bubbles: false
+        }));
+      }
+
+      _updateSelected({base}) {
+        if ((!base || base.length) && this.selected) {
+          this.selected = null;
+        }
+      }
+    }
+
+    window.customElements.define(AhNewsList.is, AhNewsList);
+  </script>
+</dom-module

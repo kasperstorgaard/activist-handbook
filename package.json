@@ -10,6 +10,7 @@
     "build/stores:w": "npm run build/stores -s -- --watch",
     "build": "npm run build/stores",
     "build:w": "npm run build/stores -- --watch",
+    "lint": "./node_modules/.bin/eslint \"@(src|build)/**/*.js\" -c .eslintrc --ignore-pattern \"**/*.built.js\"",
     "postinstall": "./node_modules/.bin/bower instal",
     "server": "./node_modules/.bin/polymer serve",
     "serve": "./node_modules/.bin/concurrently \"npm run server\" \"npm run build:w\"",

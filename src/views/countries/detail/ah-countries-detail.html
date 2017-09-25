@@ -1,7 +1,9 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../../../bower_components/google-map/google-map.html">
+<link rel="import" href="../../../../bower_components/google-map/google-map-marker.html">
 <link rel="import" href="../../../stores/stores.html">
+<link rel="import" href="../../../shared/components/ah-news.html">
 
 <dom-module id="ah-countries-detail">
   <template>
@@ -16,18 +18,8 @@
         background: white;
       }
 
-      .news {
+      ah-news {
         width: 33vw;
-        margin: 0;
-        padding: 0;
-        list-style-type: none;
-      }
-
-      .news > li {
-        display: block;
-        height: 4em;
-        border-bottom: 1px solid #dedede;
-        padding: 0;
       }
 
       #gmap {
@@ -36,17 +28,23 @@
     </style>
     <h2>[[_country.name]]</h2>
     <div class="map">
-      <ul class="news">
-        <li></li>
-        <li></li>
-        <li></li>
-      </ul>
+      <ah-news mode="by-country" country="[[name]]"></ah-news>
       <google-map id="gmap"
         api-key="AIzaSyBnrtKnpBOG4PT063JAjHK5IP2LUF2fNm8"
         latitude="[[_country.position.0]]"
         longitude="[[_country.position.1]]"
         zoom="3"
-        fit-to-markers></google-map>
+        fit-to-markers>
+        <template is="dom-repeat" items="[[_news]]">
+          <google-map-marker slot="markers"
+            news-id$="[[item.id]]"
+            icon="[[_getIcon(item.id, _selected.id)]]"
+            latitude="[[_parse(item.position.0)]]"
+            longitude="[[_parse(item.position.1)]]"
+            click-events="true"
+            on-google-map-marker-click="_selectMarker"></google-map-marker>
+        </template>
+      </google-map>
     </div>
   </template>
 
@@ -67,7 +65,9 @@
             value: () => ({ name: null })
           },
           _map: Object,
-          _feature: Object
+          _feature: Object,
+          _news: Array,
+          _selected: Object
         }
       }
 
@@ -84,13 +84,18 @@
       }
 
       _nameChanged(name) {
+        if (name == null) {
+          return;
+        }
         this._dispatch(Stores.Country.get(name));
       }
 
-      _mapStateToProps({country}) {
+      _mapStateToProps(state) {
         return {
-          _loading: country.loading,
-          _country: country.data
+          _loading: state.country.loading,
+          _country: state.country.data,
+          _news: state.news.items,
+          _selected: state.news.selected
         };
       }
 
@@ -119,6 +124,21 @@
           feature.getGeometry().forEachLatLng(latlng => bounds.extend(latlng)));
 
         map.fitBounds(bounds);
+      }
+
+      _parse(value) {
+        return value ? parseFloat(value) : value;
+      }
+
+      _getIcon(id, selectedId) {
+        return id && id === selectedId ?
+          '/static/megaphone-selected.svg' :
+          '/static/megaphone.svg';
+      }
+
+      _selectMarker(event) {
+        const id = event.target.getAttribute('news-id');
+        this._dispatch(Stores.News.select(id));
       }
     }
 

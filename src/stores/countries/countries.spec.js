@@ -10,31 +10,31 @@ function buildStore() {
   return createStore(sut.reducer, applyMiddleware(thunk));
 }
 
-function mockResponse() {
-  return {
-    allCountries: [
-      { id: 1, name: 'denmark', code: ['DK', 'DNK'] },
-      { id: 2, name: 'sweden', code: ['SE', 'SWE'] },
-      { id: 3, name: 'norway', code: ['NO', 'NOR'] }
-    ]
-  };
+function mockData() {
+  return [
+    { id: 1, name: 'denmark', code: ['DK', 'DNK'] },
+    { id: 2, name: 'sweden', code: ['SE', 'SWE'] },
+    { id: 3, name: 'norway', code: ['NO', 'NOR'] }
+  ];
 }
 
-function mockAPI(options = {}) {
-  const fail = options.fail;
-  const data = options.data || mockResponse();
-
-  const target = td.when(fetch(td.matchers.contains('//api.graph.cool'), td.matchers.anything()));
-
-  if (!fail) {
-      target.thenResolve({json: async() => ({data})});
-  } else {
-      target.thenReject();
+function buildResponse(data) {
+  return {
+    data: { allCountries: data }
   }
 }
 
+function mockApi(promises = [Promise.resolve(mockData())]) {
+  const matchApi = td.matchers.contains('//api.graph.cool');
+  td.when(fetch(matchApi, td.matchers.anything()))
+    .thenReturn(...promises.map(async promise => {
+      const response = await buildResponse(await promise);
+      return {json: async() => response};
+    }));
+}
+
 function setup() {
-  mockAPI();
+  mockApi();
   return buildStore();
 }
 
@@ -70,7 +70,7 @@ test('all() sets loading to false after response', async () => {
 
 test('all() sets items=null after failed response', async () => {
   const store = buildStore();
-  mockAPI({fail: true});
+  mockApi([Promise.reject()]);
 
   await store.dispatch(sut.all());
 
@@ -79,7 +79,7 @@ test('all() sets items=null after failed response', async () => {
 
 test('all() sets loading=false after failed response', async () => {
   const store = buildStore();
-  mockAPI({fail: true});
+  mockApi([Promise.reject()]);
 
   await store.dispatch(sut.all());
 
@@ -88,7 +88,7 @@ test('all() sets loading=false after failed response', async () => {
 
 test('all() sets failed=true after failed response', async () => {
   const store = buildStore();
-  mockAPI({fail: true});
+  mockApi([Promise.reject()]);
 
   await store.dispatch(sut.all());
 
@@ -97,7 +97,7 @@ test('all() sets failed=true after failed response', async () => {
 
 test('all() sets failed=false after second request', async () => {
   const store = buildStore();
-  mockAPI({fail: true});
+  mockApi([Promise.reject()]);
 
   await store.dispatch(sut.all());
   store.dispatch(sut.all());
@@ -137,14 +137,11 @@ test('query() filters items by code[0]', async () => {
 });
 
 test('query() sorts equal name matches by alphabet', async () => {
+  mockApi([Promise.resolve([
+    {id: 1, name: 'serbia', code: ['RS', 'SRB']},
+    {id: 2, name: 'senegal', code: ["SN", "SEN"]}
+  ])]);
   const store = buildStore();
-  const data = {
-    allCountries: [
-      {id: 1, name: 'serbia', code: ['RS', 'SRB']},
-      {id: 2, name: 'senegal', code: ["SN", "SEN"]}
-    ]
-  };
-  mockAPI({data});
 
   await store.dispatch(sut.all());
   store.dispatch(sut.query('se'));
@@ -156,14 +153,11 @@ test('query() sorts equal name matches by alphabet', async () => {
 });
 
 test('query() ranks code[0] matches before name matches', async () => {
+  mockApi([Promise.resolve([
+    {id: 1, name: 'serbia', code: ["RS", "SRB"]},
+    {id: 2, name: 'sweden', code: ['SE', 'SWE']}
+  ])]);
   const store = buildStore();
-  const data = {
-    allCountries: [
-      {id: 1, name: 'serbia', code: ["RS", "SRB"]},
-      {id: 2, name: 'sweden', code: ['SE', 'SWE']}
-    ]
-  };
-  mockAPI({data});
 
   await store.dispatch(sut.all());
   store.dispatch(sut.query('se'));

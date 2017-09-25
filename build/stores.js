@@ -1,8 +1,6 @@
-const {statSync, readdirSync, writeFile} = require('fs');
 const {join} = require('path');
 const chokidar = require('chokidar');
 const {argv} = require('yargs');
-const {promisify} = require('util');
 
 const {rollup} = require('rollup');
 const commonjs = require('rollup-plugin-commonjs');
@@ -11,7 +9,6 @@ const globals = require('rollup-plugin-node-globals');
 const builtins = require('rollup-plugin-node-builtins');
 
 const storesDir = join(__dirname, '../src/stores');
-const format = 'iife';
 
 async function build() {
   const bundle = await rollup({
@@ -34,10 +31,10 @@ async function build() {
     name: 'Stores',
     sourcemap: true
   });
-};
+}
 
 build();
 if (argv.watch) {
   chokidar.watch(join(storesDir, '/**/*.js'), {ignored: /\.(spec|built)\.js/})
-    .on('change', (event, path) => build());
+    .on('change', () => build());
 }
