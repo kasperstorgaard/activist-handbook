@@ -6,6 +6,13 @@ const INIT = 'country/INIT';
 const LOAD = 'country/LOAD';
 const FAIL = 'country/FAIL';
 
+/**
+ * Just testing hello :)
+ */
+async function doTheThing() {
+  console.log('foo!');
+}
+
 // Actions
 const init = createAction(INIT);
 const load = createAction(LOAD);
