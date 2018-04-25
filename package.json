@@ -33,6 +33,7 @@
     "chalk": "^2.1.0",
     "chokidar": "^1.7.0",
     "concurrently": "^3.5.0",
+    "danger": "^3.5.1",
     "express": "^4.15.4",
     "jest": "^20.0.4",
     "nock": "^9.0.14",
