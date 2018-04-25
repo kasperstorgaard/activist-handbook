@@ -1,6 +1,7 @@
 import {message, danger} from "danger";
 
-const modifiedMD = danger.git.modified_files.join("- ");
-message("Changed Files in this PR: \n - " + modifiedMD);
+const modifiedFiles = danger.git.modified_files
+    .map(file => `- ${file}`)
+    .join('\n');
 
-message("YO?!");
+message("Changed Files in this PR: \n" + modifiedFiles);
